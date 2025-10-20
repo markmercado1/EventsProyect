@@ -13,6 +13,10 @@ spring:
           lower-case-service-id: true
 
       routes:
+        - id: ms-events-service
+          uri: lb://ms-events-service
+          predicates:
+            - Path=/events/**
         - id: ms-auth-service
           uri: lb://ms-auth-service
           predicates:

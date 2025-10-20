@@ -31,9 +31,9 @@ public class JwtProvider {
             } else {
                 byte[] decoded = Decoders.BASE64.decode(secret);
                 if (decoded.length < 32) {
-                    System.out.println("⚠️ Clave muy corta (" + decoded.length + " bytes). Generando una nueva válida...");
+                    System.out.println("⚠ Clave muy corta (" + decoded.length + " bytes). Generando una nueva válida...");
                     tempKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-                    System.out.println("🔑 Nueva clave válida (cópiala en tu YML):");
+                    System.out.println(" Nueva clave válida (cópiala en tu YML):");
                     System.out.println(Base64.getEncoder().encodeToString(tempKey.getEncoded()));
                 } else {
                     tempKey = Keys.hmacShaKeyFor(decoded);
