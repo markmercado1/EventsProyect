@@ -17,10 +17,10 @@ public class EventDTO {
     private String description;
     private LocalDate startDate;
     private LocalDate endDate;
+    private Event.EventStatus status;
     private Event.Modality modality;
     private Event.EventType eventType;
     private Integer maxCapacity;
     private Long organizerId;
     private String address;
-    private Event.EventStatus status;
 }

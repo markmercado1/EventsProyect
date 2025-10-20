@@ -17,6 +17,7 @@ public class CreateEventDTO {
     private String description;
     private LocalDate startDate;
     private LocalDate endDate;
+    private Event.EventStatus status;
     private Event.Modality modality;
     private Event.EventType eventType;
     private Integer maxCapacity;

@@ -3,15 +3,45 @@ package com.emm.mseventoservice.mappers;
 import com.emm.mseventoservice.dtos.CreateSessionDTO;
 import com.emm.mseventoservice.dtos.SessionDTO;
 import com.emm.mseventoservice.models.Session;
+import com.emm.mseventoservice.models.Event;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface SessionMapper {
 
-    @Mapping(source = "event.eventId", target = "eventId")
-    SessionDTO toDto(Session session);
+    default SessionDTO toDto(Session session) {
+        if (session == null) {
+            return null;
+        }
 
-    @Mapping(target = "event", expression = "java(new Event(createDto.getEventId()))")
-    Session toEntityFromCreateDto(CreateSessionDTO createDto);
+        return SessionDTO.builder()
+                .sessionId(session.getSessionId())
+                .eventId(session.getEvent() != null ? session.getEvent().getEventId() : null)
+                .title(session.getTitle())
+                .dateTime(session.getDateTime())
+                .durationMinutes(session.getDurationMinutes())
+                .speaker(session.getSpeaker())
+                .build();
+    }
+
+    default Session toEntityFromCreateDto(CreateSessionDTO createDto) {
+        if (createDto == null) {
+            return null;
+        }
+
+        Session session = Session.builder()
+                .title(createDto.getTitle())
+                .dateTime(createDto.getDateTime())
+                .durationMinutes(createDto.getDurationMinutes())
+                .speaker(createDto.getSpeaker())
+                .build();
+
+        // Crear el evento con solo el ID
+        if (createDto.getEventId() != null) {
+            Event event = new Event(createDto.getEventId());
+            session.setEvent(event);
+        }
+
+        return session;
+    }
 }

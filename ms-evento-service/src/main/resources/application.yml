@@ -1,6 +1,6 @@
 spring:
   application:
-    name:
+    name: ms-events-service
   profiles:
     active: development
   config:
