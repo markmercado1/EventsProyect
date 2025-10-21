@@ -16,10 +16,14 @@ spring:
           uri: lb://ms-participants-service
           predicates:
             - Path=/participants/**, /registrations/**
+          filters:
+            - name: AuthFilter
         - id: ms-events-service
           uri: lb://ms-events-service
           predicates:
             - Path=/events/**, /sessions/**
+          filters:
+            - name: AuthFilter
         - id: ms-auth-service
           uri: lb://ms-auth-service
           predicates:
