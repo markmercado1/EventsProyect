@@ -15,11 +15,11 @@ spring:
         - id: ms-participants-service
           uri: lb://ms-participants-service
           predicates:
-            - Path=/participants/**, registrations/**
+            - Path=/participants/**, /registrations/**
         - id: ms-events-service
           uri: lb://ms-events-service
           predicates:
-            - Path=/events/**, sessions/**
+            - Path=/events/**, /sessions/**
         - id: ms-auth-service
           uri: lb://ms-auth-service
           predicates:
