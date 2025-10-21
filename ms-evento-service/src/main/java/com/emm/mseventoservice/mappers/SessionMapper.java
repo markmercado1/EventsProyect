@@ -36,7 +36,6 @@ public interface SessionMapper {
                 .speaker(createDto.getSpeaker())
                 .build();
 
-        // Crear el evento con solo el ID
         if (createDto.getEventId() != null) {
             Event event = new Event(createDto.getEventId());
             session.setEvent(event);
