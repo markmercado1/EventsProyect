@@ -11,12 +11,15 @@ spring:
         locator:
           enabled: true
           lower-case-service-id: true
-
       routes:
+        - id: ms-participants-service
+          uri: lb://ms-participants-service
+          predicates:
+            - Path=/participants/**, registrations/**
         - id: ms-events-service
           uri: lb://ms-events-service
           predicates:
-            - Path=/events/**
+            - Path=/events/**, sessions/**
         - id: ms-auth-service
           uri: lb://ms-auth-service
           predicates:
