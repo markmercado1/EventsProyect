@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>upeu</groupId>
-	<artifactId>mse-notification</artifactId>
+	<artifactId>mse-attendance</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>mse-notification</name>
+	<name>mse-attendance</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
 	<licenses>
@@ -59,7 +59,6 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-
 
 
         <dependency>
