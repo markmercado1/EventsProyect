@@ -22,7 +22,7 @@ spring:
         - id: mse-attendance
           uri: lb://mse-attendance
           predicates:
-            - Path=/attendance/**
+            - Path=/attendances/**
 
         - id: mse-notification
           uri: lb://mse-notification
