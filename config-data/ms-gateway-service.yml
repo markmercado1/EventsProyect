@@ -19,6 +19,21 @@ spring:
             - Path=/auth/**
           filters: []
 
+        - id: mse-attendance
+          uri: lb://mse-attendance
+          predicate:
+            - Path=/attendance/**
+
+        - id: mse-notifacation
+          uri: lb://mse-notifacation
+          predicate:
+            - Path=/notifacations/**, /notification-templates/**
+
+        - id: mse-report
+          uri: lb://mse-report
+          predicate:
+            - Path=/reports/**, /report-logs/**
+
 eureka:
   client:
     service-url:
