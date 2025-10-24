@@ -17,7 +17,7 @@ spring:
           uri: lb://ms-auth-service
           predicates:
             - Path=/auth/**
-          filters: []
+          
 
         - id: mse-attendance
           uri: lb://mse-attendance
