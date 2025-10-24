@@ -17,21 +17,21 @@ spring:
           uri: lb://ms-auth-service
           predicates:
             - Path=/auth/**
-          
+
 
         - id: mse-attendance
           uri: lb://mse-attendance
-          predicate:
+          predicates:
             - Path=/attendance/**
 
         - id: mse-notification
           uri: lb://mse-notification
-          predicate:
+          predicates:
             - Path=/notifications/**, /notification-templates/**
 
         - id: mse-report
           uri: lb://mse-report
-          predicate:
+          predicates:
             - Path=/reports/**, /report-logs/**
 
 eureka:
