@@ -24,10 +24,10 @@ spring:
           predicate:
             - Path=/attendance/**
 
-        - id: mse-notifacation
-          uri: lb://mse-notifacation
+        - id: mse-notification
+          uri: lb://mse-notification
           predicate:
-            - Path=/notifacations/**, /notification-templates/**
+            - Path=/notifications/**, /notification-templates/**
 
         - id: mse-report
           uri: lb://mse-report
