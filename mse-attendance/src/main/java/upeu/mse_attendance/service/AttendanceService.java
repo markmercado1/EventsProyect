@@ -1,5 +1,6 @@
 package upeu.mse_attendance.service;
 
+import upeu.mse_attendance.dto.AttendanceDTO;
 import upeu.mse_attendance.entity.Attendance;
 import java.util.List;
 import java.util.Optional;
@@ -7,17 +8,17 @@ import java.util.Optional;
 public interface AttendanceService {
 
     // Listar todas las asistencias
-    List<Attendance> listarAsistencias();
+    List<AttendanceDTO> listarAsistencias();
 
     // Obtener una asistencia por su ID
-    Optional<Attendance> obtenerAsistenciaPorId(Long id);
+    Optional<AttendanceDTO> obtenerAsistenciaPorId(Long idAttendance);
 
     // Registrar una nueva asistencia
-    Attendance registrarAsistencia(Attendance attendance);
+    AttendanceDTO registrarAsistencia(Attendance attendance);
 
     // Actualizar una asistencia existente
-    Attendance actualizarAsistencia(Long id, Attendance attendance);
+    AttendanceDTO actualizarAsistencia(Long idAttendance, AttendanceDTO attendanceDTO);
 
     // Eliminar una asistencia por ID
-    void eliminarAsistencia(Long id);
+    void eliminarAsistencia(Long idAttendance);
 }

@@ -16,7 +16,7 @@ public class ReportLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
-    private Long id;
+    private Long idReportLog;
 
     // Relación muchos a uno hacia Report
     @ManyToOne(fetch = FetchType.LAZY)

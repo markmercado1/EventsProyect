@@ -13,7 +13,7 @@ public interface ReportLogService {
 
     List<ReportLog> listarLogsPorReporte(Long idReport);
 
-    Optional<ReportLog> obtenerLogPorId(Long idLog);
+    Optional<ReportLog> obtenerLogPorId(Long idReportLog);
 
-    void eliminarLog(Long idLog);
+    void eliminarLog(Long idReportLog);
 }

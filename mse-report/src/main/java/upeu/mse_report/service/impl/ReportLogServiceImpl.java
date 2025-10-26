@@ -29,19 +29,19 @@ public class ReportLogServiceImpl implements ReportLogService {
 
     @Override
     public List<ReportLog> listarLogsPorReporte(Long idReport) {
-        return reportLogRepository.findByReportId(idReport);
+        return reportLogRepository.findByReport_IdReport(idReport);
     }
 
     @Override
-    public Optional<ReportLog> obtenerLogPorId(Long idLog) {
-        return reportLogRepository.findById(idLog);
+    public Optional<ReportLog> obtenerLogPorId(Long idReportLog) {
+        return reportLogRepository.findById(idReportLog);
     }
 
     @Override
-    public void eliminarLog(Long idLog) {
-        if (!reportLogRepository.existsById(idLog)) {
-            throw new RuntimeException("Log no encontrado con ID: " + idLog);
+    public void eliminarLog(Long idReportLog) {
+        if (!reportLogRepository.existsById(idReportLog)) {
+            throw new RuntimeException("Log no encontrado con ID: " + idReportLog);
         }
-        reportLogRepository.deleteById(idLog);
+        reportLogRepository.deleteById(idReportLog);
     }
 }

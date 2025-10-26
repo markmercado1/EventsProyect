@@ -24,8 +24,8 @@ public class ReportController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Report> obtenerReporte(@PathVariable Long id) {
-        return reportService.obtenerReportePorId(id)
+    public ResponseEntity<Report> obtenerReporte(@PathVariable Long idReport) {
+        return reportService.obtenerReportePorId(idReport)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }

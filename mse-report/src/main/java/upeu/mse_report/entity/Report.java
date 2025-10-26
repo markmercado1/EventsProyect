@@ -19,7 +19,7 @@ public class Report {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
-    private Long id;
+    private Long idReport;
 
     // Puede ser el ID del usuario o el texto "SYSTEM"
     @Column(name = "generated_by", nullable = false)

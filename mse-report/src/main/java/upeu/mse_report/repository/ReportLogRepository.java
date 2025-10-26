@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface ReportLogRepository extends JpaRepository<ReportLog, Long> {
-    List<ReportLog> findByReportId(Long reportId);
+    List<ReportLog> findByReport_IdReport(Long idReport);
 }
