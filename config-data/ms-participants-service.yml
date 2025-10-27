@@ -9,7 +9,7 @@ spring:
     show-sql: true
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3309/ms_participants
+    url: jdbc:mysql://localhost:3306/ms_participants
     username: root
     password: topgym123
 eureka:
