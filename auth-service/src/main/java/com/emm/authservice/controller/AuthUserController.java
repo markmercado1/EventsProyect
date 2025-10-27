@@ -2,24 +2,18 @@ package com.emm.authservice.controller;
 
 
 import com.emm.authservice.dtos.AuthUserDto;
-import com.emm.authservice.enums.Role;
 import com.emm.authservice.models.AuthUser;
 import com.emm.authservice.dtos.TokenDto;
-import com.emm.authservice.security.JwtProvider;
 import com.emm.authservice.service.AuthUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Set;
 
 @RestController
 @RequestMapping("/auth")
 public class AuthUserController {
     @Autowired
     AuthUserService authUserService;
-    @Autowired
-    private JwtProvider jwtProvider;
 
     @PostMapping("/login")
     public ResponseEntity<TokenDto> login(@RequestBody AuthUserDto authUserDto) {
@@ -28,20 +22,7 @@ public class AuthUserController {
             return ResponseEntity.badRequest().build();
         return ResponseEntity.ok(tokenDto);
     }
-    @GetMapping("/validate-role")
-    public ResponseEntity<Boolean> validateRole(
-            @RequestParam String token,
-            @RequestParam String role) {
-        try {
-            if (!jwtProvider.validate(token))
-                return ResponseEntity.ok(false);
 
-            Set<Role> roles = jwtProvider.getRolesFromToken(token);
-            return ResponseEntity.ok(roles.contains(Role.valueOf(role)));
-        } catch (Exception e) {
-            return ResponseEntity.ok(false);
-        }
-    }
     @PostMapping("/validate")
     public ResponseEntity<TokenDto> validate(@RequestParam String token) {
         TokenDto tokenDto = authUserService.validate(token);
@@ -63,4 +44,15 @@ public class AuthUserController {
             return ResponseEntity.badRequest().build();
         return ResponseEntity.ok(authUser);
     }
+
+
+    @GetMapping("/{id}")
+    public ResponseEntity<AuthUserDto> getUserById(@PathVariable int id) {
+        AuthUserDto user = authUserService.findById(id);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(user);
+    }
+
 }

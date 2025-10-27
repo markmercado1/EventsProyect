@@ -1,8 +1,7 @@
+
 package com.emm.authservice.security;
 
-import com.emm.authservice.enums.Role;
 import com.emm.authservice.models.AuthUser;
-
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -11,16 +10,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Base64;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class JwtProvider {
 
     private final Key key;
-
-    @Value("${jwt.expiration:3600000}") // 1 hora por defecto
-    private long expiration;
 
     public JwtProvider(@Value("${jwt.secret:}") String secret) {
         Key tempKey;
@@ -28,14 +26,14 @@ public class JwtProvider {
             if (secret == null || secret.isBlank()) {
                 // Genera una clave segura si no hay ninguna configurada
                 tempKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-                System.out.println("No se encontró jwt.secret, se generó una nueva clave temporal:");
+                System.out.println("⚠️ No se encontró jwt.secret, se generó una nueva clave temporal:");
                 System.out.println(Base64.getEncoder().encodeToString(tempKey.getEncoded()));
             } else {
                 byte[] decoded = Decoders.BASE64.decode(secret);
                 if (decoded.length < 32) {
-                    System.out.println("Clave muy corta (" + decoded.length + " bytes). Generando una nueva válida...");
+                    System.out.println("⚠️ Clave muy corta (" + decoded.length + " bytes). Generando una nueva válida...");
                     tempKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-                    System.out.println(" Nueva clave válida (cópiala en tu YML):");
+                    System.out.println("🔑 Nueva clave válida (cópiala en tu YML):");
                     System.out.println(Base64.getEncoder().encodeToString(tempKey.getEncoded()));
                 } else {
                     tempKey = Keys.hmacShaKeyFor(decoded);
@@ -51,38 +49,18 @@ public class JwtProvider {
 
     public String createToken(AuthUser authUser) {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("id", authUser.getId());
 
-        // Convierte los roles a strings para el token
-        List<String> roleNames = authUser.getRoles().stream()
-                .map(Role::name)
-                .collect(Collectors.toList());
-
-        claims.put("roles", roleNames);
+        Date now = new Date();
+        Date exp = new Date(now.getTime() + 3600000); // 1 hora
 
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(authUser.getUserName())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(key, SignatureAlgorithm.HS256) // Usa 'key' no 'secret'
+                .setIssuedAt(now)
+                .setExpiration(exp)
+                .signWith(key)
                 .compact();
-    }
-
-    public Set<Role> getRolesFromToken(String token) {
-        try {
-            List<String> roleStrings = (List<String>) Jwts.parserBuilder()
-                    .setSigningKey(key) // Usa 'key' no 'secret'
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody()
-                    .get("roles");
-
-            return roleStrings.stream()
-                    .map(Role::valueOf)
-                    .collect(Collectors.toSet());
-        } catch (Exception e) {
-            return Set.of();
-        }
     }
 
     public boolean validate(String token) {

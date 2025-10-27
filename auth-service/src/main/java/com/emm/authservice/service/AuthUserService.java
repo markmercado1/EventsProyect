@@ -12,4 +12,7 @@ public interface AuthUserService {
 
 
     TokenDto validate(String token);
+
+
+    AuthUserDto findById(int id);
 }

@@ -11,7 +11,7 @@ spring:
     driverClassName: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3309/ms_events
     username: root
-    password: 124578369scar@
+    password: topgym123
 eureka:
   client:
     serviceUrl:

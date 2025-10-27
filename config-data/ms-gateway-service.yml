@@ -11,25 +11,38 @@ spring:
         locator:
           enabled: true
           lower-case-service-id: true
+
       routes:
-        - id: ms-participants-service
-          uri: lb://ms-participants-service
-          predicates:
-            - Path=/participants/**, /registrations/**
-          filters:
-            - name: AuthFilter
-        - id: ms-events-service
-          uri: lb://ms-events-service
-          predicates:
-            - Path=/events/**, /sessions/**
-          filters:
-            - name: AuthFilter
         - id: ms-auth-service
           uri: lb://ms-auth-service
           predicates:
             - Path=/auth/**
-          filters: []
 
+
+        - id: mse-attendance
+          uri: lb://mse-attendance
+          predicates:
+            - Path=/attendances/**
+
+        - id: mse-notification
+          uri: lb://mse-notification
+          predicates:
+            - Path=/notifications/**, /notification-templates/**
+
+        - id: mse-report
+          uri: lb://mse-report
+          predicates:
+            - Path=/reports/**, /report-logs/**
+
+        - id: ms-participants-service
+          uri: lb://ms-participants-service
+          predicates:
+            - Path=/participants/**, /registrations/**
+
+        - id: mse-events-service
+          uri: lb://mse-events-service
+          predicates:
+            - Path=/events/**, /sessions/**
 eureka:
   client:
     service-url:
