@@ -12,7 +12,7 @@ spring:
           uri: https://github.com/markmercado1/EventsProyect.git # repositorio
           searchPaths:
             - config-data
-          default-label: toshibby
+          default-label: test
 
   security:
     user:
