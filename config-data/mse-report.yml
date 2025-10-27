@@ -18,7 +18,7 @@ spring:
 
 
 server:
-  port: 8083
+  port: ${PORT:${SERVER_PORT:0}}
 
 
 # Swagger OpenAPI
@@ -33,6 +33,6 @@ springdoc:
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://localhost:8095/eureka
+      defaultZone: ${EUREKA_URI:http://localhost:8095/eureka}
   instance:
-    hostname: localhost
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
