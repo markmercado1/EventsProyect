@@ -17,22 +17,21 @@ public class AttendanceController {
         this.attendanceService = attendanceService;
     }
 
+    // Registrar nueva asistencia
     @PostMapping
     public ResponseEntity<AttendanceDTO> registrarAsistencia(@RequestBody AttendanceDTO attendanceDTO) {
-        AttendanceDTO nuevaAsistencia = attendanceService.registrarAsistencia(
-                // Convertimos DTO a entidad dentro del service, no aquí
-                toEntity(attendanceDTO)
-        );
-        return ResponseEntity.ok(nuevaAsistencia);
+        AttendanceDTO savedAttendance = attendanceService.registrarAsistencia(attendanceDTO);
+        return ResponseEntity.ok(savedAttendance);
     }
 
+    // Listar todas las asistencias con datos del usuario y evento
     @GetMapping
     public ResponseEntity<List<AttendanceDTO>> listarAsistencias() {
         List<AttendanceDTO> asistencias = attendanceService.listarAsistencias();
         return ResponseEntity.ok(asistencias);
     }
 
-
+    // Obtener asistencia por ID
     @GetMapping("/{idAttendance}")
     public ResponseEntity<AttendanceDTO> obtenerAsistenciaPorId(@PathVariable Long idAttendance) {
         return attendanceService.obtenerAsistenciaPorId(idAttendance)
@@ -40,38 +39,19 @@ public class AttendanceController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-
+    // Actualizar asistencia existente
     @PutMapping("/{idAttendance}")
     public ResponseEntity<AttendanceDTO> actualizarAsistencia(
             @PathVariable Long idAttendance,
             @RequestBody AttendanceDTO attendanceDTO) {
-        try {
-            AttendanceDTO asistenciaActualizada = attendanceService.actualizarAsistencia(idAttendance, attendanceDTO);
-            return ResponseEntity.ok(asistenciaActualizada);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        AttendanceDTO updated = attendanceService.actualizarAsistencia(idAttendance, attendanceDTO);
+        return ResponseEntity.ok(updated);
     }
 
+    // Eliminar asistencia
     @DeleteMapping("/{idAttendance}")
     public ResponseEntity<Void> eliminarAsistencia(@PathVariable Long idAttendance) {
-        try {
-            attendanceService.eliminarAsistencia(idAttendance);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    private upeu.mse_attendance.entity.Attendance toEntity(AttendanceDTO dto) {
-        upeu.mse_attendance.entity.Attendance attendance = new upeu.mse_attendance.entity.Attendance();
-        attendance.setIdAttendance(dto.getIdAttendance());
-        attendance.setAuthUserId(dto.getAuthUserDTO().getId());
-        attendance.setEventId(dto.getEventDTO().getIdEvento());
-        attendance.setTimestamp(dto.getTimestamp());
-        attendance.setStatus(dto.getStatus());
-        attendance.setCheckInMethod(dto.getCheckInMethod());
-        attendance.setObservations(dto.getObservations());
-        return attendance;
+        attendanceService.eliminarAsistencia(idAttendance);
+        return ResponseEntity.noContent().build();
     }
 }

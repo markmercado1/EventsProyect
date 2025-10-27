@@ -5,6 +5,7 @@ import upeu.mse_attendance.dto.*;
 import upeu.mse_attendance.entity.Attendance;
 import upeu.mse_attendance.feign.AuthUserFeign;
 import upeu.mse_attendance.feign.EventFeign;
+import upeu.mse_attendance.feign.ParticipantFeign;
 import upeu.mse_attendance.repository.AttendanceRepository;
 import upeu.mse_attendance.service.AttendanceService;
 
@@ -17,19 +18,20 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     private final AttendanceRepository attendanceRepository;
     private final AuthUserFeign authUserFeign;
-    private final EventFeign eventoFeign;
+    private final EventFeign eventFeign;
+    private final ParticipantFeign participantFeign;
 
-    public AttendanceServiceImpl(AttendanceRepository attendanceRepository,
-                                 AuthUserFeign authUserFeign,
-                                 EventFeign eventoFeign) {
+    public AttendanceServiceImpl(AttendanceRepository attendanceRepository, AuthUserFeign authUserFeign, EventFeign eventFeign, ParticipantFeign participantFeign) {
         this.attendanceRepository = attendanceRepository;
-        this.authUserFeign = authUserFeign;
-        this.eventoFeign = eventoFeign;
+        this.authUserFeign= authUserFeign;
+        this.eventFeign= eventFeign;
+        this.participantFeign= participantFeign;
     }
 
     @Override
     public List<AttendanceDTO> listarAsistencias() {
-        return attendanceRepository.findAll().stream()
+        return attendanceRepository.findAll()
+                .stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -41,7 +43,8 @@ public class AttendanceServiceImpl implements AttendanceService {
     }
 
     @Override
-    public AttendanceDTO registrarAsistencia(Attendance attendance) {
+    public AttendanceDTO registrarAsistencia(AttendanceDTO attendanceDTO) {
+        Attendance attendance = convertToEntity(attendanceDTO);
         Attendance saved = attendanceRepository.save(attendance);
         return convertToDTO(saved);
     }
@@ -49,9 +52,8 @@ public class AttendanceServiceImpl implements AttendanceService {
     @Override
     public AttendanceDTO actualizarAsistencia(Long idAttendance, AttendanceDTO attendanceDTO) {
         if (!attendanceRepository.existsById(idAttendance)) {
-            throw new RuntimeException("❌ Asistencia no encontrada con ID: " + idAttendance);
+            throw new RuntimeException("Asistencia no encontrada con ID: " + idAttendance);
         }
-
         Attendance attendance = convertToEntity(attendanceDTO);
         attendance.setIdAttendance(idAttendance);
         Attendance updated = attendanceRepository.save(attendance);
@@ -60,38 +62,37 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     @Override
     public void eliminarAsistencia(Long idAttendance) {
-        if (!attendanceRepository.existsById(idAttendance)) {
-            throw new RuntimeException("❌ Asistencia no encontrada con ID: " + idAttendance);
-        }
         attendanceRepository.deleteById(idAttendance);
     }
 
-
     private AttendanceDTO convertToDTO(Attendance attendance) {
-        // 🔹 Comunicación vía Eureka con los otros microservicios
         AuthUserDTO user = authUserFeign.buscarPorId(attendance.getAuthUserId());
-        EventDTO event = eventoFeign.buscarPorId(attendance.getEventId());
+        EventDTO event = eventFeign.buscarPorId(attendance.getEventId());
+        ParticipantDTO participant = participantFeign.buscarPorId(attendance.getParticipantId());
 
         return AttendanceDTO.builder()
                 .idAttendance(attendance.getIdAttendance())
-                .authUserDTO(user)
-                .eventDTO(event)
                 .timestamp(attendance.getTimestamp())
                 .status(attendance.getStatus())
                 .checkInMethod(attendance.getCheckInMethod())
                 .observations(attendance.getObservations())
+                .authUserDTO(user)
+                .eventDTO(event)
+                .participantDTO(participant)
                 .build();
     }
 
     private Attendance convertToEntity(AttendanceDTO dto) {
-        Attendance attendance = new Attendance();
-        attendance.setIdAttendance(dto.getIdAttendance());
-        attendance.setAuthUserId(dto.getAuthUserDTO().getId());
-        attendance.setEventId(dto.getEventDTO().getIdEvento());
-        attendance.setTimestamp(dto.getTimestamp());
-        attendance.setStatus(dto.getStatus());
-        attendance.setCheckInMethod(dto.getCheckInMethod());
-        attendance.setObservations(dto.getObservations());
-        return attendance;
+        return Attendance.builder()
+                .idAttendance(dto.getIdAttendance())
+                .authUserId(dto.getAuthUserDTO().getId())
+                .eventId(dto.getEventDTO().getIdEvento())
+                .participantId(dto.getParticipantDTO().getIdParticipant())
+                .timestamp(dto.getTimestamp())
+                .status(dto.getStatus())
+                .checkInMethod(dto.getCheckInMethod())
+                .observations(dto.getObservations())
+                .build();
     }
 }
+

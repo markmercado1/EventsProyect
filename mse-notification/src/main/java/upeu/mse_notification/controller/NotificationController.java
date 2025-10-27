@@ -2,6 +2,7 @@ package upeu.mse_notification.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import upeu.mse_notification.dto.NotificationDTO;
 import upeu.mse_notification.entity.Notification;
 import upeu.mse_notification.service.NotificationService;
 
@@ -17,31 +18,36 @@ public class NotificationController {
         this.notificationService = notificationService;
     }
 
+    // ----------------- Listar todas las notificaciones -----------------
     @GetMapping
-    public ResponseEntity<List<Notification>> listarNotificaciones() {
-        List<Notification> notificaciones = notificationService.getAllNotifications();
+    public ResponseEntity<List<NotificationDTO>> listarNotificaciones() {
+        List<NotificationDTO> notificaciones = notificationService.getAllNotifications();
         return ResponseEntity.ok(notificaciones);
     }
 
+    // ----------------- Obtener notificación por ID -----------------
     @GetMapping("/{id}")
-    public ResponseEntity<Notification> obtenerNotificacion(@PathVariable Long id) {
+    public ResponseEntity<NotificationDTO> obtenerNotificacion(@PathVariable Long id) {
         return notificationService.getNotificationById(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Notification>> listarPorUsuario(@PathVariable String userId) {
-        List<Notification> notificaciones = notificationService.getNotificationsByUserId(userId);
+    // ----------------- Listar notificaciones por usuario -----------------
+    @GetMapping("/auth-user/{authUserId}")
+    public ResponseEntity<List<NotificationDTO>> listarPorAuthUser(@PathVariable int authUserId) {
+        List<NotificationDTO> notificaciones = notificationService.getNotificationsByAuthUserId(authUserId);
         return ResponseEntity.ok(notificaciones);
     }
 
+    // ----------------- Crear nueva notificación -----------------
     @PostMapping
     public ResponseEntity<Notification> crearNotificacion(@RequestBody Notification notification) {
         Notification guardada = notificationService.createNotification(notification);
         return ResponseEntity.ok(guardada);
     }
 
+    // ----------------- Actualizar estado de notificación -----------------
     @PutMapping("/{id}/status")
     public ResponseEntity<Notification> actualizarEstado(
             @PathVariable Long id,
@@ -54,6 +60,7 @@ public class NotificationController {
         }
     }
 
+    // ----------------- Eliminar notificación -----------------
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarNotificacion(@PathVariable Long id) {
         notificationService.deleteNotification(id);

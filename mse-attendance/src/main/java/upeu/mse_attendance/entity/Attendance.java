@@ -17,13 +17,14 @@ public class Attendance {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idAttendance;
 
-    // ID del usuario (viene de otro microservicio, por eso no se mapea como FK)
     @Column(name = "auth_user_id", nullable = false)
     private int authUserId;
 
-    // ID del evento (viene de otro microservicio, por eso no se mapea como FK)
     @Column(name = "event_id", nullable = false)
     private Long eventId;
+
+    @Column(name = "participant_id", nullable = false)
+    private Long participantId;
 
     // Momento en que se registró la asistencia
     @Column(nullable = false)

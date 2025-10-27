@@ -14,7 +14,7 @@ public interface AttendanceService {
     Optional<AttendanceDTO> obtenerAsistenciaPorId(Long idAttendance);
 
     // Registrar una nueva asistencia
-    AttendanceDTO registrarAsistencia(Attendance attendance);
+    AttendanceDTO registrarAsistencia(AttendanceDTO attendanceDTO);
 
     // Actualizar una asistencia existente
     AttendanceDTO actualizarAsistencia(Long idAttendance, AttendanceDTO attendanceDTO);

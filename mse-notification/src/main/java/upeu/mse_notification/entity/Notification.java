@@ -18,8 +18,14 @@ public class Notification {
     @Column(name = "id_notification")
     private Long idNotification;
 
-    @Column(name = "user_id", nullable = false, length = 36)
-    private String userId; // UUID del usuario (referencia externa)
+    @Column(name = "auth_user_id", nullable = false)
+    private int authUserId;
+
+    @Column(name = "participant_id", nullable = false)
+    private Long participantId;
+
+    @Column(name = "event_id", nullable = false)
+    private Long eventId;
 
     @Column(nullable = false, length = 150, name = "title")
     private String title;

@@ -44,4 +44,15 @@ public class AuthUserController {
             return ResponseEntity.badRequest().build();
         return ResponseEntity.ok(authUser);
     }
+
+
+    @GetMapping("/{id}")
+    public ResponseEntity<AuthUserDto> getUserById(@PathVariable int id) {
+        AuthUserDto user = authUserService.findById(id);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(user);
+    }
+
 }

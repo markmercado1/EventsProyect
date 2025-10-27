@@ -1,4 +1,4 @@
-package com.emm.authservice.dtos;
+package upeu.mse_notification.dto;
 
 
 import lombok.AllArgsConstructor;
@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthUserDto {
-    private Integer id;
+public class AuthUserDTO {
+    private int id;
     private String userName;
-    private String password;
+
 }

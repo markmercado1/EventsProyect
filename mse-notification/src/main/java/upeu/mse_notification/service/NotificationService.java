@@ -1,5 +1,6 @@
 package upeu.mse_notification.service;
 
+import upeu.mse_notification.dto.NotificationDTO;
 import upeu.mse_notification.entity.Notification;
 import java.util.List;
 import java.util.Optional;
@@ -10,13 +11,13 @@ public interface NotificationService {
     Notification createNotification(Notification notification);
 
     // Listar todas las notificaciones
-    List<Notification> getAllNotifications();
+    List<NotificationDTO> getAllNotifications();
 
     // Buscar notificación por ID
-    Optional<Notification> getNotificationById(Long idNotification);
+    Optional<NotificationDTO> getNotificationById(Long idNotification);
 
     // Listar notificaciones por usuario
-    List<Notification> getNotificationsByUserId(String userId);
+    List<NotificationDTO> getNotificationsByAuthUserId(int authUserId);
 
     // Actualizar estado de una notificación
     Notification updateNotificationStatus(Long idNotification, String status);
