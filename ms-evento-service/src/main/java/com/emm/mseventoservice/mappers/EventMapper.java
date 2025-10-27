@@ -1,55 +1,101 @@
 package com.emm.mseventoservice.mappers;
 
-
-import com.emm.mseventoservice.dtos.CreateEventDTO;
-import com.emm.mseventoservice.dtos.EventDTO;
+import com.emm.mseventoservice.dtos.*;
 import com.emm.mseventoservice.models.Event;
-import org.mapstruct.Mapper;
+import org.springframework.stereotype.Component;
 
-@Mapper(componentModel = "spring")
-public interface EventMapper {
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-    default EventDTO toDto(Event event) {
-        if (event == null) {
-            return null;
-        }
+@Component
+public class EventMapper {
 
-        return EventDTO.builder()
+    public Event toEntity(EventCreateDTO dto) {
+        if (dto == null) return null;
+
+        return Event.builder()
+                .name(dto.getName())
+                .description(dto.getDescription())
+                .startDate(dto.getStartDate())
+                .endDate(dto.getEndDate())
+                .modality(dto.getModality())
+                .eventType(dto.getEventType())
+                .maxCapacity(Optional.ofNullable(dto.getMaxCapacity()).orElse(0))
+                .organizerId(dto.getOrganizerId())
+                .address(dto.getAddress())
+                .status(Event.EventStatus.ACTIVE)
+                .build();
+    }
+
+    public EventResponseDTO toResponseDTO(Event event) {
+        if (event == null) return null;
+
+        return EventResponseDTO.builder()
                 .eventId(event.getEventId())
                 .name(event.getName())
                 .description(event.getDescription())
                 .startDate(event.getStartDate())
                 .endDate(event.getEndDate())
-                .status(event.getStatus())
                 .modality(event.getModality())
                 .eventType(event.getEventType())
                 .maxCapacity(event.getMaxCapacity())
                 .organizerId(event.getOrganizerId())
                 .address(event.getAddress())
+                .status(event.getStatus())
                 .build();
     }
 
-    default Event toEntityFromCreateDto(CreateEventDTO createDto) {
-        if (createDto == null) {
-            return null;
+    public EventResponseDTO toResponseDTO(Event event, OrganizerDTO organizer) {
+        EventResponseDTO dto = toResponseDTO(event);
+        if (dto != null) {
+            dto.setOrganizer(organizer);
         }
+        return dto;
+    }
 
-        Event event = Event.builder()
-                .name(createDto.getName())
-                .description(createDto.getDescription())
-                .startDate(createDto.getStartDate())
-                .endDate(createDto.getEndDate())
-                .modality(createDto.getModality())
-                .eventType(createDto.getEventType() != null ? createDto.getEventType() : Event.EventType.FREE)
-                .maxCapacity(createDto.getMaxCapacity() != null ? createDto.getMaxCapacity() : 0)
-                .organizerId(createDto.getOrganizerId())
-                .address(createDto.getAddress())
+    public EventSummaryDTO toSummaryDTO(Event event) {
+        if (event == null) return null;
+
+        return EventSummaryDTO.builder()
+                .eventId(event.getEventId())
+                .name(event.getName())
+                .startDate(event.getStartDate())
+                .endDate(event.getEndDate())
+                .modality(event.getModality())
+                .eventType(event.getEventType())
+                .maxCapacity(event.getMaxCapacity())
+                .status(event.getStatus())
                 .build();
+    }
 
-        if (createDto.getStatus() != null) {
-            event.setStatus(createDto.getStatus());
-        }
+    public List<EventResponseDTO> toResponseDTOList(List<Event> events) {
+        return mapList(events, this::toResponseDTO);
+    }
 
-        return event;
+    public List<EventSummaryDTO> toSummaryDTOList(List<Event> events) {
+        return mapList(events, this::toSummaryDTO);
+    }
+
+    public void updateEntityFromDTO(Event event, EventUpdateDTO dto) {
+        if (event == null || dto == null) return;
+
+        Optional.ofNullable(dto.getName()).ifPresent(event::setName);
+        Optional.ofNullable(dto.getDescription()).ifPresent(event::setDescription);
+        Optional.ofNullable(dto.getStartDate()).ifPresent(event::setStartDate);
+        Optional.ofNullable(dto.getEndDate()).ifPresent(event::setEndDate);
+        Optional.ofNullable(dto.getModality()).ifPresent(event::setModality);
+        Optional.ofNullable(dto.getEventType()).ifPresent(event::setEventType);
+        Optional.ofNullable(dto.getMaxCapacity()).ifPresent(event::setMaxCapacity);
+        Optional.ofNullable(dto.getAddress()).ifPresent(event::setAddress);
+        Optional.ofNullable(dto.getStatus()).ifPresent(event::setStatus);
+    }
+
+
+
+    private <T, R> List<R> mapList(List<T> source, java.util.function.Function<T, R> mapper) {
+        return Optional.ofNullable(source)
+                .map(list -> list.stream().map(mapper).collect(Collectors.toList()))
+                .orElse(List.of());
     }
 }

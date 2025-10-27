@@ -1,6 +1,7 @@
 package com.emm.mseventoservice.dtos;
 
 import com.emm.mseventoservice.models.Event;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,15 +13,23 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CreateEventDTO {
+public class EventResponseDTO {
+    
+    private Long eventId;
     private String name;
     private String description;
+    
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate startDate;
+    
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate;
-    private Event.EventStatus status;
+    
     private Event.Modality modality;
     private Event.EventType eventType;
     private Integer maxCapacity;
     private Long organizerId;
+    private OrganizerDTO organizer;
     private String address;
+    private Event.EventStatus status;
 }

@@ -1,23 +1,18 @@
 package com.example.msgatewayserver.dto;
 
 
-
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.util.Set;
 
-
-
-
-@NoArgsConstructor
-
-
-@Builder
-@AllArgsConstructor
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class TokenDto {
     private String token;
+    private String userName;
+    private Set<String> roles;
 }
 
 

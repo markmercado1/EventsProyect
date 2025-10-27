@@ -25,7 +25,7 @@ public class SessionController {
     public ResponseEntity<List<SessionDTO>> getSessionsByEvent(@PathVariable Long eventId) {
         return ResponseEntity.ok(sessionService.getSessionsByEvent(eventId));
     }
-
+    
     @GetMapping("/{id}")
     public ResponseEntity<SessionDTO> getSessionById(@PathVariable Long id) {
         return ResponseEntity.ok(sessionService.getSessionById(id));
