@@ -16,10 +16,5 @@ import java.util.Set;
 @Builder
 public class TokenDto {
     private String token;
-    private String userName;      // Agrega esto
-    private Set<String> roles;    // Agrega esto
 
-    public TokenDto(String token) {
-        this.token = token;
-    }
 }

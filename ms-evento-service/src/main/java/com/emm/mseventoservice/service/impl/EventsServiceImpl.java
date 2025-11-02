@@ -41,16 +41,23 @@ public class EventsServiceImpl implements EventService {
             throw new OrganizerNotFoundException(createDTO.getOrganizerId());
         }
 
+        // Obtener datos del organizador para confirmar que llegan
+        AuthUserDto organizer = organizerFeignClient.getUserById(createDTO.getOrganizerId());
+        log.info("Organizer obtenido desde ms-auth: {}", organizer);
+
         // Validar capacidad
         if (createDTO.getMaxCapacity() != null && createDTO.getMaxCapacity() < 0) {
             throw new InvalidEventCapacityException("Max capacity cannot be negative");
         }
 
+        // Guardar evento
         Event event = eventMapper.toEntity(createDTO);
         Event savedEvent = eventRepository.save(event);
 
         log.info("Event created successfully with ID: {}", savedEvent.getEventId());
-        return eventMapper.toResponseDTO(savedEvent);
+
+        // Mapea incluyendo el organizer
+        return eventMapper.toResponseDTO(savedEvent, organizer);
     }
 
     @Override
@@ -102,7 +109,7 @@ public class EventsServiceImpl implements EventService {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EventNotFoundException(eventId));
 
-        OrganizerDTO organizer = organizerFeignClient.getOrganizerById(event.getOrganizerId());
+        AuthUserDto organizer = organizerFeignClient.getUserById(event.getOrganizerId());
 
         return eventMapper.toResponseDTO(event, organizer);
     }

@@ -46,11 +46,12 @@ public class EventMapper {
                 .build();
     }
 
-    public EventResponseDTO toResponseDTO(Event event, OrganizerDTO organizer) {
+    public EventResponseDTO toResponseDTO(Event event, AuthUserDto organizer) {
         EventResponseDTO dto = toResponseDTO(event);
-        if (dto != null) {
-            dto.setOrganizer(organizer);
+        if (dto != null && organizer != null) {
+            dto.setOrganizer(organizer.getUserName());
         }
+
         return dto;
     }
 

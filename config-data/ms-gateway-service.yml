@@ -24,6 +24,18 @@ spring:
             - Path=/events/**, /sessions/**
           filters:
             - name: AuthFilter
+        - id: ms-registration-service
+          uri: lb://ms-registration-service
+          predicates:
+            - Path=/registrations/**
+          filters:
+            - name: AuthFilter
+        - id: ms-payment-service
+          uri: lb://ms-payment-service
+          predicates:
+            - Path=/payment-orders/**
+          filters:
+            - name: AuthFilter
         - id: ms-auth-service
           uri: lb://ms-auth-service
           predicates:
