@@ -7,9 +7,9 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(name = "registration-service", url = "${registration.service.url}")
+@FeignClient(name = "ms-registration-service", path = "/registrations")
 public interface RegistrationFeignClient {
-    
-    @GetMapping("/api/registrations/{id}")
+
+    @GetMapping("/{id}")
     RegistrationResponseDTO getRegistrationById(@PathVariable("id") Long id);
 }
