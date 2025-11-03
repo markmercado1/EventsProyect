@@ -28,7 +28,7 @@ public class KafkaConsumerConfig {
         // MUY IMPORTANTE: Configurar el JsonDeserializer
         config.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
         config.put(JsonDeserializer.USE_TYPE_INFO_HEADERS, false);
-        config.put(JsonDeserializer.VALUE_DEFAULT_TYPE, "com.emm.msregistrations.events.RegistrationCreatedEvent");
+        config.put(JsonDeserializer.VALUE_DEFAULT_TYPE, "com.emm.mspayment.events.RegistrationCreatedEvent");
 
         // Para leer desde el inicio si es un nuevo consumer group
         config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
