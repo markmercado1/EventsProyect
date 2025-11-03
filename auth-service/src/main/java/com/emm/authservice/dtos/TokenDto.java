@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -14,4 +16,5 @@ import lombok.NoArgsConstructor;
 @Builder
 public class TokenDto {
     private String token;
+
 }

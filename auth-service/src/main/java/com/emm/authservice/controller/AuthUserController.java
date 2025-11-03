@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+
 @RestController
 @RequestMapping("/auth")
 public class AuthUserController {
@@ -28,8 +29,8 @@ public class AuthUserController {
         TokenDto tokenDto = authUserService.validate(token);
         if (tokenDto == null)
             return ResponseEntity
-                .badRequest()
-                .body(new TokenDto("Token inválido o expirado"));
+                    .badRequest()
+                    .body(new TokenDto("Token inválido o expirado"));
         return ResponseEntity.ok(tokenDto);
     }
     @GetMapping
@@ -44,4 +45,19 @@ public class AuthUserController {
             return ResponseEntity.badRequest().build();
         return ResponseEntity.ok(authUser);
     }
+
+    @GetMapping("/{id}/exists")
+    public ResponseEntity<Boolean> existsById(@PathVariable Long id) {
+        boolean exists = authUserService.existsById(id);
+        return ResponseEntity.ok(exists);
+    }
+    @GetMapping("/{id}")
+    public ResponseEntity<AuthUserDto> getUserById(@PathVariable Long id) {
+        AuthUserDto user = authUserService.findById(id);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(user);
+    }
+
 }

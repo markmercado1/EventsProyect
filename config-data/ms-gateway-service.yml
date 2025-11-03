@@ -11,8 +11,31 @@ spring:
         locator:
           enabled: true
           lower-case-service-id: true
-
       routes:
+        - id: ms-participants-service
+          uri: lb://ms-participants-service
+          predicates:
+            - Path=/participants/**
+          filters:
+            - name: AuthFilter
+        - id: ms-events-service
+          uri: lb://ms-events-service
+          predicates:
+            - Path=/events/**, /sessions/**
+          filters:
+            - name: AuthFilter
+        - id: ms-registration-service
+          uri: lb://ms-registration-service
+          predicates:
+            - Path=/registrations/**
+          filters:
+            - name: AuthFilter
+        - id: ms-payment-service
+          uri: lb://ms-payment-service
+          predicates:
+            - Path=/payment-orders/**
+          filters:
+            - name: AuthFilter
         - id: ms-auth-service
           uri: lb://ms-auth-service
           predicates:
