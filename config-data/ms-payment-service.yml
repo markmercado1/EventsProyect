@@ -12,9 +12,19 @@ spring:
     url: jdbc:mysql://localhost:3309/ms_payment
     username: root
     password: 124578369scar@
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: registro-consumer-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
 eureka:
   client:
     serviceUrl:
       defaultZone: ${EUREKA_URI:http://localhost:8095/eureka}
+
   instance:
     instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
