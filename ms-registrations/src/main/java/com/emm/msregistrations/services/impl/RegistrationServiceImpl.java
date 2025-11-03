@@ -3,6 +3,7 @@ package com.emm.msregistrations.services.impl;
 
 import com.emm.msregistrations.dtos.*;
 import com.emm.msregistrations.enums.RegistrationStatus;
+import com.emm.msregistrations.events.RegistrationCreatedEvent;
 import com.emm.msregistrations.exceptions.DuplicateRegistrationException;
 import com.emm.msregistrations.exceptions.ResourceNotFoundException;
 import com.emm.msregistrations.feign.EventFeign;
@@ -11,6 +12,7 @@ import com.emm.msregistrations.feign.PaymentFeign;
 import com.emm.msregistrations.mappers.RegistrationMapper;
 import com.emm.msregistrations.models.Registration;
 import com.emm.msregistrations.repositorys.RegistrationRepository;
+import com.emm.msregistrations.services.KafkaProducerService;
 import com.emm.msregistrations.services.RegistrationService;
 import feign.FeignException;
 import jakarta.transaction.Transactional;
@@ -24,41 +26,39 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Transactional
 public class RegistrationServiceImpl implements RegistrationService {
 
     private final RegistrationRepository registrationRepository;
     private final RegistrationMapper registrationMapper;
     private final EventFeign eventFeign;
     private final ParticipantFeign participantFeign;
-    private final PaymentFeign paymentFeign;
+    private final KafkaProducerService kafkaProducerService;
 
     @Override
     public RegistrationResponseDTO createRegistration(CreateRegistrationDTO dto) {
         log.info("Creando registro para evento {} y participante {}", dto.getEventId(), dto.getParticipantId());
 
-        // Validar que el evento existe
         validateEventExists(dto.getEventId());
-
-        // Validar que el participante existe
         validateParticipantExists(dto.getParticipantId());
 
-        // Validar que no existe un registro duplicado
         if (registrationRepository.existsByEventIdAndParticipantId(dto.getEventId(), dto.getParticipantId())) {
-            throw new DuplicateRegistrationException(
-                    "Ya existe un registro para este participante en el evento especificado"
-            );
-        }
-
-        // Validar orden de pago si requiere pago
-        if (Boolean.TRUE.equals(dto.getRequiresPayment()) && dto.getPaymentOrderId() != null) {
-            validatePaymentOrderExists(dto.getPaymentOrderId());
+            throw new DuplicateRegistrationException("Ya existe un registro para este participante");
         }
 
         Registration registration = registrationMapper.toEntity(dto);
         Registration savedRegistration = registrationRepository.save(registration);
 
         log.info("Registro creado exitosamente con ID: {}", savedRegistration.getRegistrationId());
+
+        if (Boolean.TRUE.equals(dto.getRequiresPayment())) {
+            RegistrationCreatedEvent event = new RegistrationCreatedEvent(
+                    savedRegistration.getRegistrationId(),
+                    savedRegistration.getParticipantId(),
+                    savedRegistration.getEventId(),
+                    savedRegistration.getRequiresPayment()
+            );
+            kafkaProducerService.enviarRegistroCreado(event);
+        }
 
         return enrichResponseDTO(registrationMapper.toResponseDTO(savedRegistration));
     }
@@ -70,10 +70,6 @@ public class RegistrationServiceImpl implements RegistrationService {
         Registration registration = registrationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Registro no encontrado con ID: " + id));
 
-        // Validar orden de pago si se actualiza
-        if (dto.getPaymentOrderId() != null) {
-            validatePaymentOrderExists(dto.getPaymentOrderId());
-        }
 
         registrationMapper.updateEntity(dto, registration);
         Registration updatedRegistration = registrationRepository.save(registration);
@@ -192,18 +188,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
     }
 
-    private void validatePaymentOrderExists(Long paymentOrderId) {
-        try {
-            paymentFeign.getPaymentOrderById(paymentOrderId);
-            log.debug("Orden de pago validada: {}", paymentOrderId);
-        } catch (FeignException.NotFound e) {
-            log.error("Orden de pago no encontrada: {}", paymentOrderId);
-            throw new ResourceNotFoundException("Orden de pago no encontrada con ID: " + paymentOrderId);
-        } catch (FeignException e) {
-            log.error("Error al validar orden de pago: {}", e.getMessage());
-            throw new RuntimeException("Error al comunicarse con el servicio de pagos", e);
-        }
-    }
+
 
     private RegistrationResponseDTO enrichResponseDTO(RegistrationResponseDTO dto) {
         try {
@@ -222,15 +207,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             log.warn("No se pudo obtener información del participante: {}", e.getMessage());
         }
 
-        try {
-            // Obtener información de la orden de pago si existe
-            if (dto.getPaymentOrderId() != null) {
-                PaymentOrderDTO paymentOrder = paymentFeign.getPaymentOrderById(dto.getPaymentOrderId());
-                dto.setPaymentOrder(paymentOrder);
-            }
-        } catch (FeignException e) {
-            log.warn("No se pudo obtener información de la orden de pago: {}", e.getMessage());
-        }
+
 
         return dto;
     }

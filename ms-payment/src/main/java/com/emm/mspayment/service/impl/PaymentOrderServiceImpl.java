@@ -58,7 +58,6 @@ public class PaymentOrderServiceImpl implements PaymentOrderService {
     }
 
     @Override
-    @Transactional
     public List<PaymentOrderResponseDto> getAllPaymentOrders() {
         log.info("Fetching all payment orders");
 
