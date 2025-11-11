@@ -11,9 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class OrganizerDTO {
-    private Long organizerId;
-    private String name;
-    private String email;
-    private String phone;
+public class AuthUserDto {
+    private Long id;
+    private String userName;
 }

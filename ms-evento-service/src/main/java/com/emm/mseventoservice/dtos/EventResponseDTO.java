@@ -29,7 +29,7 @@ public class EventResponseDTO {
     private Event.EventType eventType;
     private Integer maxCapacity;
     private Long organizerId;
-    private OrganizerDTO organizer;
+    private String  organizer;
     private String address;
     private Event.EventStatus status;
 }

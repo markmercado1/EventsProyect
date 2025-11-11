@@ -65,6 +65,25 @@ public class AttendanceServiceImpl implements AttendanceService {
         attendanceRepository.deleteById(idAttendance);
     }
 
+
+    public List<AttendanceDTO> registrarAsistenciaGrupo(AttendanceGroupDTO groupDTO) {
+        return groupDTO.getParticipantDTOs().stream()
+                .map(participant -> {
+                    Attendance attendance = Attendance.builder()
+                            .authUserId(groupDTO.getAuthUserDTO().getId())
+                            .eventId(groupDTO.getEventDTO().getIdEvento())
+                            .participantId(participant.getIdParticipant())
+                            .status(groupDTO.getStatus())
+                            .checkInMethod(groupDTO.getCheckInMethod())
+                            .observations(groupDTO.getObservations())
+                            .build();
+
+                    Attendance saved = attendanceRepository.save(attendance);
+                    return convertToDTO(saved);
+                })
+                .collect(Collectors.toList());
+    }
+
     private AttendanceDTO convertToDTO(Attendance attendance) {
         AuthUserDTO user = authUserFeign.buscarPorId(attendance.getAuthUserId());
         EventDTO event = eventFeign.buscarPorId(attendance.getEventId());

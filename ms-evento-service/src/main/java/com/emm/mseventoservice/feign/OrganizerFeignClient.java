@@ -1,20 +1,16 @@
 package com.emm.mseventoservice.feign;
 
-import com.emm.mseventoservice.dtos.OrganizerDTO;
+import com.emm.mseventoservice.dtos.AuthUserDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(
-    name = "organizer-service",
-    url = "${organizer.service.url:http://localhost:8081}",
-    fallback = OrganizerFeignClientFallback.class
-)
+@FeignClient(name = "ms-auth-service", path = "/auth")
 public interface OrganizerFeignClient {
-    
-    @GetMapping("/api/organizers/{organizerId}")
-    OrganizerDTO getOrganizerById(@PathVariable("organizerId") Long organizerId);
-    
-    @GetMapping("/api/organizers/{organizerId}/exists")
-    Boolean existsById(@PathVariable("organizerId") Long organizerId);
+
+    @GetMapping("/{id}")
+    AuthUserDto getUserById(@PathVariable("id") Long id);
+
+    @GetMapping("/{id}/exists")
+    Boolean existsById(@PathVariable("id") Long id);
 }

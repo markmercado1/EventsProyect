@@ -1,8 +1,10 @@
 package upeu.mse_attendance.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import upeu.mse_attendance.dto.AttendanceDTO;
+import upeu.mse_attendance.dto.AttendanceGroupDTO;
 import upeu.mse_attendance.service.AttendanceService;
 
 import java.util.List;
@@ -54,4 +56,11 @@ public class AttendanceController {
         attendanceService.eliminarAsistencia(idAttendance);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/grupo")
+    public ResponseEntity<List<AttendanceDTO>> registrarAsistenciaGrupo(@RequestBody AttendanceGroupDTO dto) {
+        List<AttendanceDTO> result = attendanceService.registrarAsistenciaGrupo(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(result);
+    }
+
 }

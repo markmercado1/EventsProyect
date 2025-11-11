@@ -30,6 +30,13 @@ public class Attendance {
     @Column(nullable = false)
     private LocalDateTime timestamp = LocalDateTime.now();
 
+    @PrePersist
+    public void prePersist() {
+        if (timestamp == null) {
+            timestamp = LocalDateTime.now();
+        }
+    }
+
     // Ejemplo: PRESENT, ABSENT, LATE, EXCUSED
     @Column(nullable = false, length = 20)
     private String status;
@@ -41,4 +48,5 @@ public class Attendance {
     // Comentarios u observaciones opcionales
     @Column(length = 255)
     private String observations;
+
 }
