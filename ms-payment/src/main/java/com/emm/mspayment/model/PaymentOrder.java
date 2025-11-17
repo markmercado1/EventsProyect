@@ -23,7 +23,7 @@ public class PaymentOrder {
 
     private Long registrationId;
 
-    @Column(nullable = false, precision = 10, scale = 2)
+    @Column(nullable = true, precision = 10, scale = 2)
     private BigDecimal amount;
 
     @Column(length = 10, nullable = false)

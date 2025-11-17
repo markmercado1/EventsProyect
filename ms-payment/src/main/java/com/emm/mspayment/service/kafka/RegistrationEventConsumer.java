@@ -18,7 +18,7 @@ public class RegistrationEventConsumer {
     private final PaymentOrderRepository paymentOrderRepository;
 
     @KafkaListener(
-        topics = "registration-created-topic",
+        topics = "registros-topic",
         groupId = "pago-consumer-group",
         containerFactory = "kafkaListenerContainerFactory"
     )
