@@ -1,4 +1,4 @@
-package com.emm.msregistrations.services.impl;
+package com.emm.msregistrations.services.kafka;
 
 import com.emm.msregistrations.events.RegistrationCreatedEvent;
 import com.emm.msregistrations.services.KafkaProducerService;

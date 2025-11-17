@@ -5,12 +5,14 @@ import com.emm.mspayment.dto.PaymentOrderResponseDto;
 import com.emm.mspayment.dto.PaymentOrderUpdateDto;
 import com.emm.mspayment.dto.RegistrationResponseDTO;
 import com.emm.mspayment.enums.PaymentStatus;
+import com.emm.mspayment.events.PaymentProcessedEvent;
 import com.emm.mspayment.exceptions.ResourceNotFoundException;
 import com.emm.mspayment.feign.RegistrationFeignClient;
 import com.emm.mspayment.mapper.PaymentOrderMapper;
 import com.emm.mspayment.model.PaymentOrder;
 import com.emm.mspayment.repository.PaymentOrderRepository;
 import com.emm.mspayment.service.PaymentOrderService;
+import com.emm.mspayment.service.kafka.KafkaProducerService;
 import feign.FeignException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +32,7 @@ public class PaymentOrderServiceImpl implements PaymentOrderService {
     private final PaymentOrderRepository paymentOrderRepository;
     private final RegistrationFeignClient registrationFeignClient;
     private final PaymentOrderMapper paymentOrderMapper;
-
+    private final KafkaProducerService kafkaProducerService;
     @Override
     @Transactional
     public PaymentOrderResponseDto createPaymentOrder(PaymentOrderRequestDto requestDto) {
@@ -94,6 +96,7 @@ public class PaymentOrderServiceImpl implements PaymentOrderService {
         log.info("Updating payment order status for ID: {} to {}", id, updateDto.getStatus());
 
         PaymentOrder paymentOrder = findPaymentOrderById(id);
+        PaymentStatus oldStatus = paymentOrder.getStatus();
         paymentOrder.setStatus(updateDto.getStatus());
 
         if (updateDto.getStatus() == PaymentStatus.COMPLETED) {
@@ -101,8 +104,13 @@ public class PaymentOrderServiceImpl implements PaymentOrderService {
         }
 
         PaymentOrder updatedOrder = paymentOrderRepository.save(paymentOrder);
-        RegistrationResponseDTO registration = getRegistrationFromService(updatedOrder.getRegistrationId());
 
+        // ← NUEVO: Enviar evento si cambió a COMPLETED o FAILED
+        if (shouldSendPaymentEvent(oldStatus, updateDto.getStatus())) {
+            sendPaymentProcessedEvent(updatedOrder);
+        }
+
+        RegistrationResponseDTO registration = getRegistrationFromService(updatedOrder.getRegistrationId());
         return paymentOrderMapper.toResponseDto(updatedOrder, registration);
     }
 
@@ -125,12 +133,15 @@ public class PaymentOrderServiceImpl implements PaymentOrderService {
         paymentOrder.setPaymentDate(LocalDateTime.now());
 
         PaymentOrder processedOrder = paymentOrderRepository.save(paymentOrder);
+
+        // ← NUEVO: Enviar evento de pago procesado
+        sendPaymentProcessedEvent(processedOrder);
+
         RegistrationResponseDTO registration = getRegistrationFromService(processedOrder.getRegistrationId());
 
         log.info("Payment processed successfully for order ID: {}", id);
         return paymentOrderMapper.toResponseDto(processedOrder, registration);
     }
-
     @Override
     @Transactional
     public void deletePaymentOrder(Long id) {
@@ -171,5 +182,22 @@ public class PaymentOrderServiceImpl implements PaymentOrderService {
             log.warn("Could not fetch registration data for ID: {}", order.getRegistrationId());
             return paymentOrderMapper.toResponseDto(order, null);
         }
+    }
+    private boolean shouldSendPaymentEvent(PaymentStatus oldStatus, PaymentStatus newStatus) {
+        return (newStatus == PaymentStatus.COMPLETED || newStatus == PaymentStatus.FAILED)
+                && oldStatus != newStatus;
+    }
+
+    private void sendPaymentProcessedEvent(PaymentOrder paymentOrder) {
+        PaymentProcessedEvent event = new PaymentProcessedEvent(
+                paymentOrder.getRegistrationId(),
+                paymentOrder.getPaymentOrderId(),
+                paymentOrder.getStatus(),
+                paymentOrder.getAmount(),
+                paymentOrder.getPaymentDate()
+        );
+
+        kafkaProducerService.sendPaymentProcessedEvent(event);
+        log.info("PaymentProcessedEvent enviado para registrationId: {}", paymentOrder.getRegistrationId());
     }
 }

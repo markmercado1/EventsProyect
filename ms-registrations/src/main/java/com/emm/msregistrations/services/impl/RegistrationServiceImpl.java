@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -46,18 +47,28 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
 
         Registration registration = registrationMapper.toEntity(dto);
+        registration.setStatus(RegistrationStatus.PENDING); // ← Aseguramos que inicie en PENDING
         Registration savedRegistration = registrationRepository.save(registration);
 
         log.info("Registro creado exitosamente con ID: {}", savedRegistration.getRegistrationId());
 
         if (Boolean.TRUE.equals(dto.getRequiresPayment())) {
+            BigDecimal amount = BigDecimal.valueOf(100.00);
+
             RegistrationCreatedEvent event = new RegistrationCreatedEvent(
                     savedRegistration.getRegistrationId(),
                     savedRegistration.getParticipantId(),
                     savedRegistration.getEventId(),
-                    savedRegistration.getRequiresPayment()
+                    savedRegistration.getRequiresPayment(),
+                    amount  // ← NUEVO
             );
             kafkaProducerService.enviarRegistroCreado(event);
+            log.info("Evento RegistrationCreatedEvent enviado a Kafka para registrationId: {}", savedRegistration.getRegistrationId());
+        } else {
+            // Si no requiere pago, confirmamos el registro inmediatamente
+            registration.setStatus(RegistrationStatus.CONFIRMED);
+            registrationRepository.save(registration);
+            log.info("Registro confirmado sin requerir pago para registrationId: {}", savedRegistration.getRegistrationId());
         }
 
         return enrichResponseDTO(registrationMapper.toResponseDTO(savedRegistration));
