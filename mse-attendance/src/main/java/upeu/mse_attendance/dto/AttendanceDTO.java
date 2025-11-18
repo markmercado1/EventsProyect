@@ -23,5 +23,5 @@ public class AttendanceDTO {
 
     private AuthUserDTO authUserDTO;
     private EventDTO eventDTO;
-    private ParticipantDTO participantDTO;
+    private RegistrationResponseDTO registrationResponseDTO;
 }

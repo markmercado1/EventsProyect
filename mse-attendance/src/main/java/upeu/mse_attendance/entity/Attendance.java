@@ -27,7 +27,7 @@ public class Attendance {
     private Long eventId;
 
     @Column(name = "participant_id", nullable = false)
-    private Long participantId;
+    private Long registrationId;
 
     // Momento en que se registró la asistencia
     @Column(nullable = false)

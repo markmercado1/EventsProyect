@@ -14,7 +14,7 @@ import java.util.List;
 public class AttendanceGroupDTO {
     private AuthUserDTO authUserDTO;
     private EventDTO eventDTO;
-    private List<ParticipantDTO> participantDTOs;
+    private List<RegistrationResponseDTO> registrationResponseDTOList;
     private AttendanceStatus status;
     private CheckInMethod checkInMethod;
     private String observations;

@@ -19,21 +19,26 @@ public class AttendanceController {
         this.attendanceService = attendanceService;
     }
 
-    // Registrar nueva asistencia
+    // ------------------------------------------------------------
+    // REGISTRAR ASISTENCIA INDIVIDUAL
+    // ------------------------------------------------------------
     @PostMapping
     public ResponseEntity<AttendanceDTO> registrarAsistencia(@RequestBody AttendanceDTO attendanceDTO) {
         AttendanceDTO savedAttendance = attendanceService.registrarAsistencia(attendanceDTO);
-        return ResponseEntity.ok(savedAttendance);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedAttendance);
     }
 
-    // Listar todas las asistencias con datos del usuario y evento
+    // ------------------------------------------------------------
+    // LISTAR TODAS LAS ASISTENCIAS
+    // ------------------------------------------------------------
     @GetMapping
     public ResponseEntity<List<AttendanceDTO>> listarAsistencias() {
-        List<AttendanceDTO> asistencias = attendanceService.listarAsistencias();
-        return ResponseEntity.ok(asistencias);
+        return ResponseEntity.ok(attendanceService.listarAsistencias());
     }
 
-    // Obtener asistencia por ID
+    // ------------------------------------------------------------
+    // OBTENER ASISTENCIA POR ID
+    // ------------------------------------------------------------
     @GetMapping("/{idAttendance}")
     public ResponseEntity<AttendanceDTO> obtenerAsistenciaPorId(@PathVariable Long idAttendance) {
         return attendanceService.obtenerAsistenciaPorId(idAttendance)
@@ -41,26 +46,35 @@ public class AttendanceController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // Actualizar asistencia existente
+    // ------------------------------------------------------------
+    // ACTUALIZAR ASISTENCIA
+    // ------------------------------------------------------------
     @PutMapping("/{idAttendance}")
     public ResponseEntity<AttendanceDTO> actualizarAsistencia(
             @PathVariable Long idAttendance,
             @RequestBody AttendanceDTO attendanceDTO) {
+
         AttendanceDTO updated = attendanceService.actualizarAsistencia(idAttendance, attendanceDTO);
         return ResponseEntity.ok(updated);
     }
 
-    // Eliminar asistencia
+    // ------------------------------------------------------------
+    // ELIMINAR ASISTENCIA
+    // ------------------------------------------------------------
     @DeleteMapping("/{idAttendance}")
     public ResponseEntity<Void> eliminarAsistencia(@PathVariable Long idAttendance) {
         attendanceService.eliminarAsistencia(idAttendance);
         return ResponseEntity.noContent().build();
     }
 
+    // ------------------------------------------------------------
+    // REGISTRO DE ASISTENCIA EN GRUPO (por registros)
+    // ------------------------------------------------------------
     @PostMapping("/grupo")
-    public ResponseEntity<List<AttendanceDTO>> registrarAsistenciaGrupo(@RequestBody AttendanceGroupDTO dto) {
+    public ResponseEntity<List<AttendanceDTO>> registrarAsistenciaGrupo(
+            @RequestBody AttendanceGroupDTO dto) {
+
         List<AttendanceDTO> result = attendanceService.registrarAsistenciaGrupo(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
-
 }

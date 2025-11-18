@@ -5,7 +5,7 @@ import upeu.mse_attendance.dto.*;
 import upeu.mse_attendance.entity.Attendance;
 import upeu.mse_attendance.feign.AuthUserFeign;
 import upeu.mse_attendance.feign.EventFeign;
-import upeu.mse_attendance.feign.ParticipantFeign;
+import upeu.mse_attendance.feign.RegistrationFeign;
 import upeu.mse_attendance.repository.AttendanceRepository;
 import upeu.mse_attendance.service.AttendanceService;
 
@@ -19,15 +19,23 @@ public class AttendanceServiceImpl implements AttendanceService {
     private final AttendanceRepository attendanceRepository;
     private final AuthUserFeign authUserFeign;
     private final EventFeign eventFeign;
-    private final ParticipantFeign participantFeign;
+    private final RegistrationFeign registrationFeign;
 
-    public AttendanceServiceImpl(AttendanceRepository attendanceRepository, AuthUserFeign authUserFeign, EventFeign eventFeign, ParticipantFeign participantFeign) {
+    public AttendanceServiceImpl(
+            AttendanceRepository attendanceRepository,
+            AuthUserFeign authUserFeign,
+            EventFeign eventFeign,
+            RegistrationFeign registrationFeign
+    ) {
         this.attendanceRepository = attendanceRepository;
-        this.authUserFeign= authUserFeign;
-        this.eventFeign= eventFeign;
-        this.participantFeign= participantFeign;
+        this.authUserFeign = authUserFeign;
+        this.eventFeign = eventFeign;
+        this.registrationFeign = registrationFeign;
     }
 
+    // ---------------------------------------------------------
+    // LISTAR TODO
+    // ---------------------------------------------------------
     @Override
     public List<AttendanceDTO> listarAsistencias() {
         return attendanceRepository.findAll()
@@ -36,12 +44,18 @@ public class AttendanceServiceImpl implements AttendanceService {
                 .collect(Collectors.toList());
     }
 
+    // ---------------------------------------------------------
+    // BUSCAR POR ID
+    // ---------------------------------------------------------
     @Override
     public Optional<AttendanceDTO> obtenerAsistenciaPorId(Long idAttendance) {
         return attendanceRepository.findById(idAttendance)
                 .map(this::convertToDTO);
     }
 
+    // ---------------------------------------------------------
+    // REGISTRAR SIMPLE
+    // ---------------------------------------------------------
     @Override
     public AttendanceDTO registrarAsistencia(AttendanceDTO attendanceDTO) {
         Attendance attendance = convertToEntity(attendanceDTO);
@@ -49,6 +63,9 @@ public class AttendanceServiceImpl implements AttendanceService {
         return convertToDTO(saved);
     }
 
+    // ---------------------------------------------------------
+    // ACTUALIZAR
+    // ---------------------------------------------------------
     @Override
     public AttendanceDTO actualizarAsistencia(Long idAttendance, AttendanceDTO attendanceDTO) {
         if (!attendanceRepository.existsById(idAttendance)) {
@@ -60,19 +77,28 @@ public class AttendanceServiceImpl implements AttendanceService {
         return convertToDTO(updated);
     }
 
+    // ---------------------------------------------------------
+    // ELIMINAR
+    // ---------------------------------------------------------
     @Override
     public void eliminarAsistencia(Long idAttendance) {
         attendanceRepository.deleteById(idAttendance);
     }
 
-
+    // ---------------------------------------------------------
+    // REGISTRO POR GRUPO
+    // ---------------------------------------------------------
+    @Override
     public List<AttendanceDTO> registrarAsistenciaGrupo(AttendanceGroupDTO groupDTO) {
-        return groupDTO.getParticipantDTOs().stream()
-                .map(participant -> {
+
+        return groupDTO.getRegistrationResponseDTOList()
+                .stream()
+                .map(registration -> {
+
                     Attendance attendance = Attendance.builder()
                             .authUserId(groupDTO.getAuthUserDTO().getId())
                             .eventId(groupDTO.getEventDTO().getIdEvento())
-                            .participantId(participant.getIdParticipant())
+                            .registrationId(registration.getRegistrationId())
                             .status(groupDTO.getStatus())
                             .checkInMethod(groupDTO.getCheckInMethod())
                             .observations(groupDTO.getObservations())
@@ -84,10 +110,16 @@ public class AttendanceServiceImpl implements AttendanceService {
                 .collect(Collectors.toList());
     }
 
+
+    // ---------------------------------------------------------
+    // CONVERTIR ENTIDAD → DTO
+    // ---------------------------------------------------------
     private AttendanceDTO convertToDTO(Attendance attendance) {
+
         AuthUserDTO user = authUserFeign.buscarPorId(attendance.getAuthUserId());
         EventDTO event = eventFeign.buscarPorId(attendance.getEventId());
-        ParticipantDTO participant = participantFeign.buscarPorId(attendance.getParticipantId());
+        RegistrationResponseDTO registration =
+                registrationFeign.buscarPorId(attendance.getRegistrationId());
 
         return AttendanceDTO.builder()
                 .idAttendance(attendance.getIdAttendance())
@@ -97,16 +129,19 @@ public class AttendanceServiceImpl implements AttendanceService {
                 .observations(attendance.getObservations())
                 .authUserDTO(user)
                 .eventDTO(event)
-                .participantDTO(participant)
+                .registrationResponseDTO(registration)
                 .build();
     }
 
+    // ---------------------------------------------------------
+    // CONVERTIR DTO → ENTIDAD
+    // ---------------------------------------------------------
     private Attendance convertToEntity(AttendanceDTO dto) {
         return Attendance.builder()
                 .idAttendance(dto.getIdAttendance())
                 .authUserId(dto.getAuthUserDTO().getId())
                 .eventId(dto.getEventDTO().getIdEvento())
-                .participantId(dto.getParticipantDTO().getIdParticipant())
+                .registrationId(dto.getRegistrationResponseDTO().getRegistrationId())
                 .timestamp(dto.getTimestamp())
                 .status(dto.getStatus())
                 .checkInMethod(dto.getCheckInMethod())
@@ -114,4 +149,3 @@ public class AttendanceServiceImpl implements AttendanceService {
                 .build();
     }
 }
-
