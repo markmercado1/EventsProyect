@@ -36,6 +36,12 @@ spring:
             - Path=/payment-orders/**
           filters:
             - name: AuthFilter
+        - id: mse-attendance
+          uri: lb://mse-attendance
+          predicates:
+            - Path=/attendances/**
+          filters:
+            - name: AuthFilter
         - id: ms-auth-service
           uri: lb://ms-auth-service
           predicates:
