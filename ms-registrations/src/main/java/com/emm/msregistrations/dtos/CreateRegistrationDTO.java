@@ -18,7 +18,5 @@ public class CreateRegistrationDTO {
     @NotNull(message = "El ID del participante es obligatorio")
     private Long participantId;
     
-    private Boolean requiresPayment;
-    
-    private Long paymentOrderId;
+
 }

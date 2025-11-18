@@ -25,6 +25,7 @@ public class EventMapper {
                 .organizerId(dto.getOrganizerId())
                 .address(dto.getAddress())
                 .status(Event.EventStatus.ACTIVE)
+                .price(dto.getPrice())
                 .build();
     }
 
@@ -43,6 +44,7 @@ public class EventMapper {
                 .organizerId(event.getOrganizerId())
                 .address(event.getAddress())
                 .status(event.getStatus())
+                .price(event.getPrice())
                 .build();
     }
 
@@ -67,6 +69,7 @@ public class EventMapper {
                 .eventType(event.getEventType())
                 .maxCapacity(event.getMaxCapacity())
                 .status(event.getStatus())
+                .price(event.getPrice())
                 .build();
     }
 
@@ -90,6 +93,8 @@ public class EventMapper {
         Optional.ofNullable(dto.getMaxCapacity()).ifPresent(event::setMaxCapacity);
         Optional.ofNullable(dto.getAddress()).ifPresent(event::setAddress);
         Optional.ofNullable(dto.getStatus()).ifPresent(event::setStatus);
+        Optional.ofNullable(dto.getPrice()).ifPresent(event::setPrice);
+
     }
 
 

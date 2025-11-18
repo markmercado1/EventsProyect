@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -38,4 +39,15 @@ public class Registration {
     @Column(length = 255)
     private String qrCode;
 
+    private Long paymentOrderId;
+    @Column(nullable = false)
+    private BigDecimal eventPrice = BigDecimal.ZERO;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private EventType eventType; // FREE o PAID
+    public enum EventType {
+        FREE,
+        PAID
+    }
 }

@@ -128,13 +128,11 @@ public class PaymentOrderServiceImpl implements PaymentOrderService {
         paymentOrder.setStatus(PaymentStatus.PROCESSING);
         paymentOrderRepository.save(paymentOrder);
 
-        // Aquí iría la lógica de integración con pasarela de pago
         paymentOrder.setStatus(PaymentStatus.COMPLETED);
         paymentOrder.setPaymentDate(LocalDateTime.now());
 
         PaymentOrder processedOrder = paymentOrderRepository.save(paymentOrder);
 
-        // ← NUEVO: Enviar evento de pago procesado
         sendPaymentProcessedEvent(processedOrder);
 
         RegistrationResponseDTO registration = getRegistrationFromService(processedOrder.getRegistrationId());

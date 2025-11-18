@@ -2,12 +2,14 @@ package com.emm.mseventoservice.dtos;
 
 import com.emm.mseventoservice.models.Event;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
@@ -46,4 +48,8 @@ public class EventCreateDTO {
 
     @Size(max = 255, message = "Address must not exceed 255 characters")
     private String address;
+    @Column(precision = 10, scale = 2)
+
+    private BigDecimal price = BigDecimal.ZERO; // ← NUEVO
+
 }

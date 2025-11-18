@@ -21,8 +21,7 @@ public class RegistrationMapper {
                 .participantId(dto.getParticipantId())
                 .registrationDate(LocalDateTime.now())
                 .status(RegistrationStatus.PENDING)
-                .requiresPayment(dto.getRequiresPayment() != null ? dto.getRequiresPayment() : false)
-                .paymentOrderId(dto.getPaymentOrderId())
+
                 .build();
     }
 
@@ -39,13 +38,7 @@ public class RegistrationMapper {
             entity.setQrCode(dto.getQrCode());
         }
 
-        if (dto.getRequiresPayment() != null) {
-            entity.setRequiresPayment(dto.getRequiresPayment());
-        }
 
-        if (dto.getPaymentOrderId() != null) {
-            entity.setPaymentOrderId(dto.getPaymentOrderId());
-        }
     }
 
     public RegistrationResponseDTO toResponseDTO(Registration entity) {
@@ -60,8 +53,6 @@ public class RegistrationMapper {
                 .registrationDate(entity.getRegistrationDate())
                 .status(entity.getStatus())
                 .qrCode(entity.getQrCode())
-                .requiresPayment(entity.getRequiresPayment())
-                .paymentOrderId(entity.getPaymentOrderId())
                 .build();
     }
 }
