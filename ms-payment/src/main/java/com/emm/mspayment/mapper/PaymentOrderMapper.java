@@ -41,7 +41,6 @@ public class PaymentOrderMapper {
                 .status(entity.getStatus())
                 .creationDate(entity.getCreationDate())
                 .paymentDate(entity.getPaymentDate())
-                .registration(registration)
                 .build();
     }
 }

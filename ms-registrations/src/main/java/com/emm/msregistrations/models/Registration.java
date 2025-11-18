@@ -38,9 +38,4 @@ public class Registration {
     @Column(length = 255)
     private String qrCode;
 
-    @Column(nullable = false)
-    private Boolean requiresPayment = false;
-
-    private Long paymentOrderId;
-
 }

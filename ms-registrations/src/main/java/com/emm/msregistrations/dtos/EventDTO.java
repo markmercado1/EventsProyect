@@ -1,5 +1,6 @@
 package com.emm.msregistrations.dtos;
 
+import com.emm.msregistrations.enums.EventType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,4 +18,5 @@ public class EventDTO {
     private String description;
     private LocalDateTime eventDate;
     private String location;
+    private EventType eventType;
 }

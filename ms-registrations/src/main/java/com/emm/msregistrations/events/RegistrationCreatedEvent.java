@@ -6,6 +6,5 @@ public record RegistrationCreatedEvent(
         Long registrationId,
         Long participantId,
         Long eventId,
-        Boolean requiresPayment,
         BigDecimal amount
 ) {}

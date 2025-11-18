@@ -59,7 +59,6 @@ public class RegistrationServiceImpl implements RegistrationService {
                     savedRegistration.getRegistrationId(),
                     savedRegistration.getParticipantId(),
                     savedRegistration.getEventId(),
-                    savedRegistration.getRequiresPayment(),
                     amount  // ← NUEVO
             );
             kafkaProducerService.enviarRegistroCreado(event);
@@ -203,7 +202,6 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     private RegistrationResponseDTO enrichResponseDTO(RegistrationResponseDTO dto) {
         try {
-            // Obtener información del evento
             EventDTO event = eventFeign.getEventById(dto.getEventId());
             dto.setEvent(event);
         } catch (FeignException e) {
@@ -211,7 +209,6 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
 
         try {
-            // Obtener información del participante
             ParticipantDTO participant = participantFeign.getParticipantById(dto.getParticipantId());
             dto.setParticipant(participant);
         } catch (FeignException e) {
