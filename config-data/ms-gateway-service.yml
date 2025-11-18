@@ -18,6 +18,7 @@ spring:
               - POST
               - PUT
               - DELETE
+              - OPTIONS
             allowedCredentials: true
       discovery:
         locator:
@@ -30,16 +31,10 @@ spring:
           predicates:
             - Path=/auth/**
 
-
         - id: mse-attendance
           uri: lb://mse-attendance
           predicates:
             - Path=/attendances/**
-
-        - id: mse-event
-          uri: lb://mse-event
-          predicates:
-            - Path=/events/**
 
         - id: mse-notification
           uri: lb://mse-notification
@@ -54,12 +49,30 @@ spring:
         - id: ms-participants-service
           uri: lb://ms-participants-service
           predicates:
-            - Path=/participants/**, /registrations/**
-
-        - id: mse-events-service
-          uri: lb://mse-events-service
+            - Path=/participants/**
+          filters:
+            - name: AuthFilter
+        - id: ms-events-service
+          uri: lb://ms-events-service
           predicates:
             - Path=/events/**, /sessions/**
+          filters:
+            - name: AuthFilter
+        - id: ms-registration-service
+          uri: lb://ms-registration-service
+          predicates:
+            - Path=/registrations/**
+          filters:
+            - name: AuthFilter
+        - id: ms-payment-service
+          uri: lb://ms-payment-service
+          predicates:
+            - Path=/payment-orders/**
+          filters:
+            - name: AuthFilter
+
+
+
 eureka:
   client:
     service-url:

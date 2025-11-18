@@ -9,10 +9,10 @@ spring:
     config:
       server:
         git:
-          uri: https://github.com/Toshibby/clasesAvance.git
+          uri: https://github.com/markmercado1/EventsProyect.git
           searchPaths:
             - config-data
-          default-label: main
+          default-label: test
 
   security:
     user:
