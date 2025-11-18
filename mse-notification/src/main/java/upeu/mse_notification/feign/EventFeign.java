@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import upeu.mse_notification.dto.EventDTO;
 
-@FeignClient(name="ms-events-service", path = "/events", contextId = "eventFeignClient")
+@FeignClient(name="mse-event", path = "/events", contextId = "eventFeignClient")
 public interface EventFeign {
     @GetMapping("/{id}")
     @CircuitBreaker(name = "eventoListarPorIdCB", fallbackMethod = "fallbackEvent")

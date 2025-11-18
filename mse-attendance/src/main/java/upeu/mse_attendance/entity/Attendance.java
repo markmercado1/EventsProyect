@@ -2,6 +2,9 @@ package upeu.mse_attendance.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import upeu.mse_attendance.enums.AttendanceStatus;
+import upeu.mse_attendance.enums.CheckInMethod;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -37,13 +40,13 @@ public class Attendance {
         }
     }
 
-    // Ejemplo: PRESENT, ABSENT, LATE, EXCUSED
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private String status;
+    private AttendanceStatus status;
 
-    // Ejemplo: QR, MANUAL, NFC, etc.
+    @Enumerated(EnumType.STRING)
     @Column(name = "check_in_method", length = 50)
-    private String checkInMethod;
+    private CheckInMethod checkInMethod;
 
     // Comentarios u observaciones opcionales
     @Column(length = 255)

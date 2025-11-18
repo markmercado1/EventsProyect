@@ -7,6 +7,18 @@ spring:
 
   cloud:
     gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:4200"
+            allowedHeaders: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+            allowedCredentials: true
       discovery:
         locator:
           enabled: true
@@ -23,6 +35,11 @@ spring:
           uri: lb://mse-attendance
           predicates:
             - Path=/attendances/**
+
+        - id: mse-event
+          uri: lb://mse-event
+          predicates:
+            - Path=/events/**
 
         - id: mse-notification
           uri: lb://mse-notification

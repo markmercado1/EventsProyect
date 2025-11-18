@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import upeu.mse_attendance.enums.AttendanceStatus;
+import upeu.mse_attendance.enums.CheckInMethod;
 
 import java.time.LocalDateTime;
 
@@ -15,8 +17,8 @@ import java.time.LocalDateTime;
 public class AttendanceDTO {
     private Long idAttendance;
     private LocalDateTime timestamp;
-    private String status;
-    private String checkInMethod;
+    private AttendanceStatus status;
+    private CheckInMethod checkInMethod;
     private String observations;
 
     private AuthUserDTO authUserDTO;

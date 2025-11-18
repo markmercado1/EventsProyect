@@ -65,9 +65,12 @@ public class AuthUserServiceImpl implements AuthUserService {
             return null;
         return new TokenDto(token);
     }
-
     @Override
-    public AuthUserDto findById(int id) {
+    public boolean existsById(Long id) {
+        return authUserRepository.existsById(id);
+    }
+    @Override
+    public AuthUserDto findById(Long id) {
         Optional<AuthUser> userOpt = authUserRepository.findById(id);
         if (userOpt.isEmpty()) return null;
 

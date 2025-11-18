@@ -10,9 +10,7 @@ public interface AuthUserService {
 
     TokenDto login(AuthUserDto authUserDto);
 
-
+    AuthUserDto findById(Long id);
+    boolean existsById(Long id);
     TokenDto validate(String token);
-
-
-    AuthUserDto findById(int id);
 }
