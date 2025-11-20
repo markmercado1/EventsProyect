@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
@@ -32,4 +33,6 @@ public class EventResponseDTO {
     private String  organizer;
     private String address;
     private Event.EventStatus status;
+
+    private BigDecimal price;
 }

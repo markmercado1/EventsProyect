@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 
@@ -40,4 +41,5 @@ public class EventUpdateDTO {
     private String address;
     
     private Event.EventStatus status;
+    private BigDecimal price;
 }

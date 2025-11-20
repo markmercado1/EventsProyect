@@ -14,14 +14,12 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AttendanceDTO {
+public class AttendanceCreateDTO {
     private Long idAttendance;
     private LocalDateTime timestamp;
     private AttendanceStatus status;
     private CheckInMethod checkInMethod;
     private String observations;
 
-    private AuthUserDTO authUserDTO;
-    private EventDTO eventDTO;
-    private RegistrationResponseDTO registrationResponseDTO;
+    private Long registrationId;
 }

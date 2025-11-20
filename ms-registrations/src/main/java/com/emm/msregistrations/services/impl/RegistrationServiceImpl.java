@@ -39,36 +39,46 @@ public class RegistrationServiceImpl implements RegistrationService {
     public RegistrationResponseDTO createRegistration(CreateRegistrationDTO dto) {
         log.info("Creando registro para evento {} y participante {}", dto.getEventId(), dto.getParticipantId());
 
-        validateEventExists(dto.getEventId());
+        // 1. Validar y OBTENER el evento (no solo validar)
+        EventDTO event = validateAndGetEvent(dto.getEventId());
         validateParticipantExists(dto.getParticipantId());
 
+        // 2. Verificar duplicados
         if (registrationRepository.existsByEventIdAndParticipantId(dto.getEventId(), dto.getParticipantId())) {
             throw new DuplicateRegistrationException("Ya existe un registro para este participante");
         }
 
+        // 3. Crear el registro CON los datos del evento
         Registration registration = registrationMapper.toEntity(dto);
-        registration.setStatus(RegistrationStatus.PENDING); // ← Aseguramos que inicie en PENDING
-        Registration savedRegistration = registrationRepository.save(registration);
+        registration.setStatus(RegistrationStatus.PENDING);
 
+        // ✅ AUTOMÁTICO: convertir String a Enum y setear datos del evento
+        registration.setEventType(
+                Registration.EventType.valueOf(event.getEventType()) // String "PAID" → Enum PAID
+        );
+        registration.setEventPrice(event.getPrice() != null ? event.getPrice() : BigDecimal.ZERO);
+
+        Registration savedRegistration = registrationRepository.save(registration);
         log.info("Registro creado exitosamente con ID: {}", savedRegistration.getRegistrationId());
 
-        if (Boolean.TRUE.equals(dto.getRequiresPayment())) {
-            BigDecimal amount = BigDecimal.valueOf(100.00);
-
-            RegistrationCreatedEvent event = new RegistrationCreatedEvent(
+        // 4. Decidir flujo según el tipo de evento
+        if ("PAID".equalsIgnoreCase(event.getEventType())) {  // ← Comparar String
+            // Evento de pago: enviar a Kafka para que ms-payment genere la orden
+            RegistrationCreatedEvent kafkaEvent = new RegistrationCreatedEvent(
                     savedRegistration.getRegistrationId(),
                     savedRegistration.getParticipantId(),
                     savedRegistration.getEventId(),
-                    savedRegistration.getRequiresPayment(),
-                    amount  // ← NUEVO
+                    event.getPrice()  // ← precio real del evento
             );
-            kafkaProducerService.enviarRegistroCreado(event);
-            log.info("Evento RegistrationCreatedEvent enviado a Kafka para registrationId: {}", savedRegistration.getRegistrationId());
+            kafkaProducerService.enviarRegistroCreado(kafkaEvent);
+            log.info("Evento PAID: mensaje enviado a Kafka para pago de registrationId: {}",
+                    savedRegistration.getRegistrationId());
         } else {
-            // Si no requiere pago, confirmamos el registro inmediatamente
-            registration.setStatus(RegistrationStatus.CONFIRMED);
-            registrationRepository.save(registration);
-            log.info("Registro confirmado sin requerir pago para registrationId: {}", savedRegistration.getRegistrationId());
+            // Evento gratuito: confirmar automáticamente
+            savedRegistration.setStatus(RegistrationStatus.CONFIRMED);
+            registrationRepository.save(savedRegistration);
+            log.info("Evento FREE: registro confirmado automáticamente para registrationId: {}",
+                    savedRegistration.getRegistrationId());
         }
 
         return enrichResponseDTO(registrationMapper.toResponseDTO(savedRegistration));
@@ -199,7 +209,20 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
     }
 
-
+    private EventDTO validateAndGetEvent(Long eventId) {
+        try {
+            EventDTO event = eventFeign.getEventById(eventId);
+            log.debug("Evento obtenido: {} - Tipo: {} - Precio: {}",
+                    eventId, event.getEventType(), event.getPrice());
+            return event;
+        } catch (FeignException.NotFound e) {
+            log.error("Evento no encontrado: {}", eventId);
+            throw new ResourceNotFoundException("Evento no encontrado con ID: " + eventId);
+        } catch (FeignException e) {
+            log.error("Error al validar evento: {}", e.getMessage());
+            throw new RuntimeException("Error al comunicarse con el servicio de eventos", e);
+        }
+    }
 
     private RegistrationResponseDTO enrichResponseDTO(RegistrationResponseDTO dto) {
         try {

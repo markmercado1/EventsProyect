@@ -3,7 +3,7 @@ package com.emm.mspayment.enums;
 
 public enum PaymentStatus {
     PENDING,
-    PROCESSING,
+        PROCESSING,
     COMPLETED,
     FAILED,
     CANCELLED

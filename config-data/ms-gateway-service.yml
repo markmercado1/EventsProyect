@@ -35,16 +35,22 @@ spring:
           uri: lb://mse-attendance
           predicates:
             - Path=/attendances/**
+          filters:
+            - name: AuthFilter
 
         - id: mse-notification
           uri: lb://mse-notification
           predicates:
             - Path=/notifications/**, /notification-templates/**
+          filters:
+            - name: AuthFilter
 
         - id: mse-report
           uri: lb://mse-report
           predicates:
             - Path=/reports/**, /report-logs/**
+          filters:
+            - name: AuthFilter
 
         - id: ms-participants-service
           uri: lb://ms-participants-service
