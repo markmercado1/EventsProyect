@@ -1,89 +1,119 @@
 package upeu.mse_notification.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
-import upeu.mse_notification.dto.AuthUserDTO;
-import upeu.mse_notification.dto.EventDTO;
-import upeu.mse_notification.dto.NotificationDTO;
-import upeu.mse_notification.dto.ParticipantDTO;
+import upeu.mse_notification.dto.NotificationResponseDTO;
 import upeu.mse_notification.entity.Notification;
-import upeu.mse_notification.feign.AuthUserFeign;
-import upeu.mse_notification.feign.EventFeign;
-import upeu.mse_notification.feign.ParticipantFeign;
+import upeu.mse_notification.entity.NotificationTemplate;
 import upeu.mse_notification.repository.NotificationRepository;
 import upeu.mse_notification.service.NotificationService;
+import upeu.mse_notification.service.NotificationTemplateService;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class NotificationServiceImpl implements NotificationService {
 
     private final NotificationRepository notificationRepository;
-    private final AuthUserFeign authUserFeign;
-    private final EventFeign eventFeign;
-    private final ParticipantFeign participantFeign;
+    private final NotificationTemplateService templateService;
+    private final JavaMailSender mailSender;
+
 
     @Override
-    public Notification createNotification(Notification notification) {
+    public List<NotificationResponseDTO> findAll() {
+        return notificationRepository.findAll()
+                .stream()
+                .map(n -> NotificationResponseDTO.builder()
+                        .notificationId(n.getNotificationId())
+                        .templateCode(n.getTemplateCode())
+                        .participantId(n.getParticipantId())
+                        .registrationId(n.getRegistrationId())
+                        .attendanceId(n.getAttendanceId())
+                        .eventId(n.getEventId())
+                        .channel(n.getChannel())
+                        .title(n.getTitle())
+                        .message(n.getMessage())
+                        .status(n.getStatus())
+                        .errorMessage(n.getErrorMessage())
+                        .sentAt(n.getSentAt())
+                        .createdAt(n.getCreatedAt())
+                        .build()
+                ).toList();
+    }
+
+    @Override
+    public Notification sendNotification(Notification notification) {
+
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(notification.getEmailTo());
+            message.setSubject(notification.getTitle());
+            message.setText(notification.getMessage());
+
+            mailSender.send(message);
+
+            notification.setStatus("SENT");
+            notification.setSentAt(LocalDateTime.now());
+
+        } catch (Exception e) {
+            notification.setStatus("ERROR");
+            notification.setErrorMessage(e.getMessage());
+            e.printStackTrace();
+        }
+
         return notificationRepository.save(notification);
     }
 
-    @Override
-    public List<NotificationDTO> getAllNotifications() {
-        return notificationRepository.findAll()
-                .stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-    }
 
     @Override
-    public Optional<NotificationDTO> getNotificationById(Long idNotification) {
-        return notificationRepository.findById(idNotification)
-                .map(this::convertToDTO);
-    }
+    public Notification sendUsingTemplate(
+            String templateCode,
+            Long participantId,
+            Long registrationId,
+            Long attendanceId,
+            Long eventId,
+            String emailTo,
+            Object dataObj
+    ) {
+        Map<String, Object> data = (Map<String, Object>) dataObj;
 
-    @Override
-    public List<NotificationDTO> getNotificationsByAuthUserId(int authUserId) {
-        return notificationRepository.findAll()
-                .stream()
-                .filter(n -> n.getAuthUserId() == authUserId)
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-    }
+        NotificationTemplate template = templateService.getByCode(templateCode);
 
-    @Override
-    public Notification updateNotificationStatus(Long idNotification, String status) {
-        Notification notification = notificationRepository.findById(idNotification)
-                .orElseThrow(() -> new RuntimeException("Notification not found"));
-        notification.setStatus(status);
-        return notificationRepository.save(notification);
-    }
+        String message = fillTemplate(template.getBody(), data);
+        String subject = fillTemplate(template.getSubject(), data);
 
-    @Override
-    public void deleteNotification(Long idNotification) {
-        notificationRepository.deleteById(idNotification);
-    }
-
-    // ----------------- Conversión a DTO usando Feign -----------------
-    private NotificationDTO convertToDTO(Notification notification) {
-        AuthUserDTO authUserDTO = authUserFeign.buscarPorId(notification.getAuthUserId());
-        EventDTO eventDTO = eventFeign.buscarPorId(notification.getEventId());
-        ParticipantDTO participantDTO = participantFeign.buscarPorId(notification.getParticipantId());
-
-        return NotificationDTO.builder()
-                .idNotification(notification.getIdNotification())
-                .title(notification.getTitle())
-                .message(notification.getMessage())
-                .type(notification.getType())
-                .status(notification.getStatus())
-                .createdAt(notification.getCreatedAt())
-                .sentAt(notification.getSentAt())
-                .authUserDTO(authUserDTO)
-                .eventDTO(eventDTO)
-                .participantDTO(participantDTO)
+        Notification notification = Notification.builder()
+                .templateCode(templateCode)
+                .participantId(participantId)
+                .registrationId(registrationId)
+                .attendanceId(attendanceId)
+                .eventId(eventId)
+                .emailTo(emailTo)
+                .channel("EMAIL")
+                .title(subject)
+                .message(message)
+                .status("PENDING")
+                .createdAt(LocalDateTime.now())
                 .build();
+
+        notificationRepository.save(notification);
+
+        return sendNotification(notification);
+    }
+
+
+    private String fillTemplate(String text, Map<String, Object> data) {
+        String output = text;
+
+        for (String key : data.keySet()) {
+            output = output.replace("{{" + key + "}}", data.get(key).toString());
+        }
+
+        return output;
     }
 }

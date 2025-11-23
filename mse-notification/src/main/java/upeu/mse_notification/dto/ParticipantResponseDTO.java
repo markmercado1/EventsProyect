@@ -1,18 +1,12 @@
 package upeu.mse_notification.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
+import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class ParticipantDTO {
-    private Long idParticipant;
+public class ParticipantResponseDTO {
+    private Long participantId;
     private String firstName;
     private String lastName;
     private String email;

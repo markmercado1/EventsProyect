@@ -10,6 +10,5 @@ import java.util.List;
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
 
-    // Custom query method
-    List<Notification> findByAuthUserId(int authUserId);
+
 }

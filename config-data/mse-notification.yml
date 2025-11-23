@@ -1,4 +1,15 @@
 spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
   application:
     name: mse-notification
 
@@ -59,12 +70,3 @@ resilience4j.circuitbreaker:
       failureRateThreshold: 50
       eventConsumerBufferSize: 10
 
-    authListarPorIdCB:
-      registerHealthIndicator: true
-      slidingWindowSize: 10
-      permittedNumberOfCallsInHalfOpenState: 3
-      slidingWindowType: TIME_BASED
-      minimumNumberOfCalls: 4
-      waitDurationInOpenState: 5s
-      failureRateThreshold: 50
-      eventConsumerBufferSize: 10

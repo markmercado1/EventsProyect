@@ -1,31 +1,54 @@
 package upeu.mse_notification.entity;
 
+
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "notification_template")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class NotificationTemplate {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_template")
-    private Long idTemplate;
+    private Long templateId;
 
     @Column(nullable = false, unique = true, length = 100)
+    private String code; // PARTICIPANT_WELCOME, REGISTRATION_CONFIRMED, etc.
+
+    @Column(nullable = false, length = 150)
     private String name;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String content; // Contenido con placeholders dinámicos
+    @Column(nullable = false, length = 50)
+    private String channel; // EMAIL, SMS, WHATSAPP, PUSH
 
-    @Column(nullable = false, length = 30)
-    private String type; // ATTENDANCE_ALERT, EVENT_REMINDER, GENERAL
+    @Column(length = 150)
+    private String subject;
+
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String body;
 
     @Column(nullable = false)
-    private Boolean enabled;
+    private Boolean isActive = true;
+
+    @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    private LocalDateTime createdAt;
+
+    @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    public void prePersist() {
+        if (createdAt == null) createdAt = LocalDateTime.now();
+        if (updatedAt == null) updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

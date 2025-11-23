@@ -9,6 +9,5 @@ import java.util.Optional;
 @Repository
 public interface NotificationTemplateRepository extends JpaRepository<NotificationTemplate, Long> {
 
-    // Buscar plantilla por nombre
-    Optional<NotificationTemplate> findByName(String name);
+    Optional<NotificationTemplate> findByCodeAndIsActiveTrue(String code);
 }

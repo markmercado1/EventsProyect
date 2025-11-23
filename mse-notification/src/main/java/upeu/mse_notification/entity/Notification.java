@@ -1,9 +1,7 @@
 package upeu.mse_notification.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
@@ -11,94 +9,45 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Notification {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_notification")
-    private Long idNotification;
+    private Long notificationId;
 
-    @Column(name = "auth_user_id", nullable = false)
-    private int authUserId;
+    @Column(nullable = false, length = 100)
+    private String templateCode; // Relación lógica
 
-    @Column(name = "participant_id", nullable = false)
     private Long participantId;
-
-    // 🔹 Hacer eventId opcional si el evento puede ser temporal
-    @Column(name = "event_id", nullable = false)
+    private Long registrationId;
+    private Long attendanceId;
     private Long eventId;
 
-    @Column(nullable = false, length = 150, name = "title")
+    @Column(nullable = false, length = 50)
+    private String channel;
+
+    @Column(nullable = false, length = 150)
     private String title;
 
-    @Column(nullable = false, columnDefinition = "TEXT", name = "message")
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String message;
 
-    @Column(nullable = false, length = 30, name = "type")
-    private String type; // ATTENDANCE_ALERT, EVENT_REMINDER, GENERAL
+    @Column(nullable = false, length = 20)
+    private String status; // PENDING, SENT, FAILED
 
-    @Column(nullable = false, length = 20, name = "status")
-    private String status; // SENT, PENDING, FAILED
+    private String errorMessage;
 
-    @Column(nullable = false, name = "created_at")
-    private LocalDateTime createdAt;
-
-    @Column(name = "sent_at")
     private LocalDateTime sentAt;
 
-    // 🔹 Se ejecuta antes de persistir la entidad para inicializar createdAt
+    @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    private LocalDateTime createdAt;
+
     @PrePersist
     public void prePersist() {
-        createdAt = LocalDateTime.now();
+        if (createdAt == null) createdAt = LocalDateTime.now();
     }
+
+    private String emailTo;
+
 }
-
-
-//package upeu.mse_notification.entity;
-//
-//import jakarta.persistence.*;
-//import lombok.AllArgsConstructor;
-//import lombok.Data;
-//import lombok.NoArgsConstructor;
-//import java.time.LocalDateTime;
-//
-//@Entity
-//@Table(name = "notification")
-//@Data
-//@NoArgsConstructor
-//@AllArgsConstructor
-//public class Notification {
-//
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    @Column(name = "id_notification")
-//    private Long idNotification;
-//
-//    @Column(name = "auth_user_id", nullable = false)
-//    private int authUserId;
-//
-//    @Column(name = "participant_id", nullable = false)
-//    private Long participantId;
-//
-//    @Column(name = "event_id", nullable = false)
-//    private Long eventId;
-//
-//    @Column(nullable = false, length = 150, name = "title")
-//    private String title;
-//
-//    @Column(nullable = false, columnDefinition = "TEXT", name = "message")
-//    private String message;
-//
-//    @Column(nullable = false, length = 30, name = "type")
-//    private String type; // ATTENDANCE_ALERT, EVENT_REMINDER, GENERAL
-//
-//
-//    @Column(nullable = false, length = 20, name = "status")
-//    private String status; // SENT, PENDING, FAILED
-//
-//    @Column(nullable = false, name = "created_at")
-//    private LocalDateTime createdAt;
-//
-//    @Column(name = "sent_at")
-//    private LocalDateTime sentAt;
-//}
