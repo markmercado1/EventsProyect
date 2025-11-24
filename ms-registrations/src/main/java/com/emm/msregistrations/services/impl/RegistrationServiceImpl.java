@@ -7,6 +7,7 @@ import com.emm.msregistrations.events.RegistrationCreatedEvent;
 import com.emm.msregistrations.exceptions.DuplicateRegistrationException;
 import com.emm.msregistrations.exceptions.ResourceNotFoundException;
 import com.emm.msregistrations.feign.EventFeign;
+import com.emm.msregistrations.feign.NotificationFeign;
 import com.emm.msregistrations.feign.ParticipantFeign;
 import com.emm.msregistrations.feign.PaymentFeign;
 import com.emm.msregistrations.mappers.RegistrationMapper;
@@ -34,6 +35,9 @@ public class RegistrationServiceImpl implements RegistrationService {
     private final EventFeign eventFeign;
     private final ParticipantFeign participantFeign;
     private final KafkaProducerService kafkaProducerService;
+
+    private final NotificationFeign notificationFeign;
+
 
     @Override
     public RegistrationResponseDTO createRegistration(CreateRegistrationDTO dto) {
@@ -80,6 +84,21 @@ public class RegistrationServiceImpl implements RegistrationService {
             log.info("Evento FREE: registro confirmado automáticamente para registrationId: {}",
                     savedRegistration.getRegistrationId());
         }
+        // 5️⃣ Enviar notificación al participante
+        try {
+            NotificationCreateDTO notificationRequest = new NotificationCreateDTO();
+            notificationRequest.setParticipantId(savedRegistration.getParticipantId());
+            notificationRequest.setEventId(savedRegistration.getEventId());
+            notificationRequest.setTemplateCode("PARTICIPANT_WELCOME"); // o el template que corresponda
+
+            NotificationResponseLocalDTO notificationResponse = notificationFeign.sendNotification(notificationRequest);
+            log.info("Notificación enviada correctamente: {}", notificationResponse);
+
+        } catch (Exception e) {
+            // No bloquea la creación del registro si falla la notificación
+            log.error("Error al enviar notificación para registrationId {}: {}", savedRegistration.getRegistrationId(), e.getMessage());
+        }
+
 
         return enrichResponseDTO(registrationMapper.toResponseDTO(savedRegistration));
     }

@@ -1,10 +1,11 @@
-package upeu.mse_notification.dto;
+package com.emm.msregistrations.dtos;
+
 import lombok.Data;
 import java.time.LocalDateTime;
 
+// DTO que recibimos de vuelta del microservicio de notificación
 @Data
-public class NotificationResponseDTO {
-
+public class NotificationResponseLocalDTO {
     private Long notificationId;
     private String title;
     private String message;

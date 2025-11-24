@@ -52,4 +52,6 @@ public class Notification {
         if (status == null) status = "PENDING";
         if (channel == null) channel = "EMAIL";
     }
+
+
 }
