@@ -17,7 +17,7 @@ public class Notification {
     private Long notificationId;
 
     @Column(nullable = false, length = 100)
-    private String templateCode; // Relación lógica
+    private String templateCode;
 
     private Long participantId;
     private Long registrationId;
@@ -34,7 +34,7 @@ public class Notification {
     private String message;
 
     @Column(nullable = false, length = 20)
-    private String status; // PENDING, SENT, FAILED
+    private String status; // PENDING, SENT, ERROR
 
     private String errorMessage;
 
@@ -43,11 +43,13 @@ public class Notification {
     @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
 
+    @Column(nullable = false, length = 150)
+    private String emailTo;
+
     @PrePersist
     public void prePersist() {
         if (createdAt == null) createdAt = LocalDateTime.now();
+        if (status == null) status = "PENDING";
+        if (channel == null) channel = "EMAIL";
     }
-
-    private String emailTo;
-
 }

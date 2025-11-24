@@ -4,11 +4,13 @@ import upeu.mse_notification.dto.NotificationResponseDTO;
 import upeu.mse_notification.entity.Notification;
 
 import java.util.List;
+import java.util.Map;
 
 public interface NotificationService {
 
     List<NotificationResponseDTO> findAll();
 
+    Notification createNotification(Notification notification);
 
     Notification sendNotification(Notification notification);
 
@@ -19,7 +21,8 @@ public interface NotificationService {
             Long attendanceId,
             Long eventId,
             String emailTo,
-            Object data
+            Map<String, Object> data
     );
-}
 
+    NotificationResponseDTO mapToDTO(Notification notification);
+}

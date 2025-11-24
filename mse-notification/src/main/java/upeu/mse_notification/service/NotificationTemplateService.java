@@ -1,13 +1,14 @@
 package upeu.mse_notification.service;
 
-
-import upeu.mse_notification.entity.NotificationTemplate;
+import upeu.mse_notification.dto.TemplateCreateDTO;
+import upeu.mse_notification.dto.TemplateResponseDTO;
+import upeu.mse_notification.dto.TemplateUpdateDTO;
 
 public interface NotificationTemplateService {
 
-    NotificationTemplate create(NotificationTemplate template);
+    TemplateResponseDTO create(TemplateCreateDTO dto);
 
-    NotificationTemplate update(Long templateId, NotificationTemplate template);
+    TemplateResponseDTO update(Long templateId, TemplateUpdateDTO dto);
 
-    NotificationTemplate getByCode(String code);
+    TemplateResponseDTO getByCode(String code);
 }
